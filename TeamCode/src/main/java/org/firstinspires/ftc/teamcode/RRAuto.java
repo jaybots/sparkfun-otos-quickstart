@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -63,11 +64,15 @@ public class RRAuto extends LinearOpMode {
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(0, 0, 0))
-                .lineToX(12)
-                .turn(Math.PI);
+                .lineToX(27);
+                //turn(Math.PI);
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(20, 0,Math.PI ))
-                .lineToX(0);
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(27, 0,0 ))
+                .setTangent(0)
+                .splineToConstantHeading(new Vector2d(24,-24),0)
+                .splineToConstantHeading(new Vector2d(40,-24),0)
+                .splineToConstantHeading(new Vector2d(48,-30),0)
+                .splineToConstantHeading(new Vector2d(18,-30),0);
 
 
         while (!isStopRequested() && !opModeIsActive()) {
@@ -75,8 +80,8 @@ public class RRAuto extends LinearOpMode {
             telemetry.addData("ready to","start");
         }
         boolean done = false;
-        lift.setPower(0);
-        tilt.setPower(0);
+        lift.setPower(1);
+        tilt.setPower(1);
         while (opModeIsActive() && !done) {
 
             if (isStopRequested()) return;
@@ -85,9 +90,9 @@ public class RRAuto extends LinearOpMode {
             tilt.setTargetPosition(320);
             Actions.runBlocking(new SequentialAction(tab1.build()));
             tilt.setTargetPosition(490);
-            sleep(500);
+            sleep(300);
             lift.setTargetPosition(1500);
-            sleep(600);
+            sleep(200);
             claw.setPosition(0.3);
             lift.setTargetPosition(0);
             tilt.setTargetPosition(0);
