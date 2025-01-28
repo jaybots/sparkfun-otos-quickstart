@@ -6,7 +6,9 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -55,8 +57,7 @@ public class RRAuto extends LinearOpMode {
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         tilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        lift.setPower(1);
-        tilt.setPower(1);
+
         hang.setPower(0);
         spin1.setPower(0);
         spin2.setPower(0);
@@ -74,16 +75,10 @@ public class RRAuto extends LinearOpMode {
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .lineToX(20);
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(0, 0, 0))
+                .lineToX(12);
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(20, 0, 0))
                 .lineToX(0);
-
-
-
-
-        // actions that need to happen on init; for instance, a claw tightening.
-
 
 
         while (!isStopRequested() && !opModeIsActive()) {
@@ -91,17 +86,15 @@ public class RRAuto extends LinearOpMode {
             telemetry.addData("ready to","start");
         }
         boolean done = false;
+        lift.setPower(1);
+        tilt.setPower(1);
         while (opModeIsActive() && !done) {
 
             if (isStopRequested()) return;
 
             lift.setTargetPosition(2050);
             tilt.setTargetPosition(320);
-            Actions.runBlocking(
-                    new SequentialAction(
-                            tab1.build()
-                    )
-            );
+            Actions.runBlocking(new SequentialAction(tab1.build()));
             tilt.setTargetPosition(490);
             sleep(500);
             lift.setTargetPosition(1500);
@@ -109,13 +102,9 @@ public class RRAuto extends LinearOpMode {
             claw.setPosition(0.3);
             lift.setTargetPosition(0);
             tilt.setTargetPosition(0);
-            Actions.runBlocking(
-                    new SequentialAction(
-                            tab2.build()
-                    )
-            );
-
-            sleep(30000);
+            Actions.runBlocking(new SequentialAction(tab2.build()));
+            lift.setPower(0);
+            tilt.setPower(0);
             done = true;
         }
     }
