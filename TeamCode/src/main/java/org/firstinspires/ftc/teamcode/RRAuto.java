@@ -76,8 +76,10 @@ public class RRAuto extends LinearOpMode {
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(0, 0, 0))
-                .lineToX(12);
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(20, 0, 0))
+                .lineToX(12)
+                .turn(Math.PI);
+
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(20, 0,Math.PI ))
                 .lineToX(0);
 
 
@@ -86,8 +88,8 @@ public class RRAuto extends LinearOpMode {
             telemetry.addData("ready to","start");
         }
         boolean done = false;
-        lift.setPower(1);
-        tilt.setPower(1);
+        lift.setPower(0);
+        tilt.setPower(0);
         while (opModeIsActive() && !done) {
 
             if (isStopRequested()) return;
