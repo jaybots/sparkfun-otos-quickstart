@@ -64,14 +64,15 @@ public class RRAuto extends LinearOpMode {
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .lineToYLinearHeading(-32, Math.PI/2);
+                .lineToY(-32);
 
 
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(7, -32,Math.PI/2 ))
-                .strafeTo(new Vector2d(32,-33))
-                .splineToConstantHeading(new Vector2d(40,-10),Math.PI/2)
-                .lineToYLinearHeading(-55,Math.PI/2)
-                .lineToYLinearHeading(-50,Math.PI/2)
+                .strafeTo(new Vector2d(24,-34))
+                .splineToConstantHeading(new Vector2d(38,-10),Math.PI/2)
+                .splineToConstantHeading(new Vector2d(48,-10),Math.PI/2)
+                .lineToY(-50)
+                .lineToY(-40)
                 .turn(Math.PI);
                 //.forward(15)
                 //.lineToLinearHeading(new Pose2d(9,-35,Math.PI/2))
@@ -88,14 +89,13 @@ public class RRAuto extends LinearOpMode {
         while (opModeIsActive() && !done) {
 
             if (isStopRequested()) return;
-
-            lift.setTargetPosition(2050);
-            tilt.setTargetPosition(320);
+            lift.setTargetPosition(2100);
+            tilt.setTargetPosition(400);
             Actions.runBlocking(new SequentialAction(tab1.build()));
-            tilt.setTargetPosition(490);
-            sleep(300);
+            tilt.setTargetPosition(520);
+            sleep(500);
             lift.setTargetPosition(1500);
-            sleep(200);
+            sleep(400);
             claw.setPosition(0.3);
             lift.setTargetPosition(0);
             tilt.setTargetPosition(0);
