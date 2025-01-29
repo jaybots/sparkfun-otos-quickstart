@@ -60,19 +60,22 @@ public class RRAuto extends LinearOpMode {
         lift.setTargetPosition(0);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
+        Pose2d initialPose = new Pose2d(7, -61, Math.toRadians(90));
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(new Pose2d(0, 0, 0))
-                .lineToX(27);
-                //turn(Math.PI);
+        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+                .lineToYLinearHeading(-32, Math.PI/2);
 
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(27, 0,0 ))
-                .setTangent(0)
-                .splineToConstantHeading(new Vector2d(24,-24),0)
-                .splineToConstantHeading(new Vector2d(40,-24),0)
-                .splineToConstantHeading(new Vector2d(48,-30),0)
-                .splineToConstantHeading(new Vector2d(18,-30),0);
+
+        TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(7, -32,Math.PI/2 ))
+                .strafeTo(new Vector2d(32,-33))
+                .splineToConstantHeading(new Vector2d(40,-10),Math.PI/2)
+                .lineToYLinearHeading(-55,Math.PI/2)
+                .lineToYLinearHeading(-50,Math.PI/2)
+                .turn(Math.PI);
+                //.forward(15)
+                //.lineToLinearHeading(new Pose2d(9,-35,Math.PI/2))
+
 
 
         while (!isStopRequested() && !opModeIsActive()) {
