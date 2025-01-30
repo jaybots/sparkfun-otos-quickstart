@@ -70,9 +70,9 @@ public class RRAuto extends LinearOpMode {
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(7, -32,Math.PI/2 ))
                 .strafeTo(new Vector2d(24,-34))
                 .splineToConstantHeading(new Vector2d(38,-10),Math.PI/2)
-                .splineToConstantHeading(new Vector2d(48,-10),Math.PI/2)
-                .lineToY(-50)
-                .lineToY(-40)
+                .strafeTo(new Vector2d(48,-10))
+                .lineToY( -50)
+                .lineToY( -40)
                 .turn(Math.PI);
                 //.forward(15)
                 //.lineToLinearHeading(new Pose2d(9,-35,Math.PI/2))
