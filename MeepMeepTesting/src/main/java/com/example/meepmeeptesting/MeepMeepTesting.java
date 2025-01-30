@@ -20,9 +20,13 @@ public class MeepMeepTesting {
                         .splineToConstantHeading(new Vector2d(35,-21),Math.PI/2)
                         .splineToConstantHeading(new Vector2d(47,-11),-Math.PI/2)
                         .splineToConstantHeading(new Vector2d(47,-46),-Math.PI/2)
-                        .splineToLinearHeading(new Pose2d(47,0,-Math.PI/2),-Math.PI/2)
-                        .splineToConstantHeading(new Vector2d(58,-46),-Math.PI/2)
-                        .splineToConstantHeading(new Vector2d(47,-46),-Math.PI/2)
+                        .setTangent(Math.PI/2)
+                        .splineToConstantHeading(new Vector2d(47,-10),Math.PI/2)
+                        .splineToConstantHeading(new Vector2d(57,-20),-Math.PI/2)
+                        .splineToConstantHeading(new Vector2d(57,-46),-Math.PI/2)
+                        //.splineToConstantHeading(new Vector2d(56,0),Math.PI/2)
+                        //.splineToConstantHeading(new Vector2d(62,-20),-Math.PI/2)
+                        //.splineToConstantHeading(new Vector2d(62,-46),-Math.PI/2)
                         .build());
 
 
