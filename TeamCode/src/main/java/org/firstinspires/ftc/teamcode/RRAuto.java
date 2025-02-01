@@ -1,10 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Pose2dDual;
+import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -70,12 +77,13 @@ public class RRAuto extends LinearOpMode {
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(7, -33,Math.PI/2 ))
                 .setTangent(-Math.PI/2)
                 .splineToSplineHeading(new Pose2d(35,-31,-Math.PI/2),Math.PI/2)
-                .splineToConstantHeading(new Vector2d(35,-21),Math.PI/2)
-                .splineToConstantHeading(new Vector2d(47,-11),-Math.PI/2)
-                .splineToConstantHeading(new Vector2d(47,-46),-Math.PI/2)
-                .splineToConstantHeading(new Vector2d(47,-46),-Math.PI/2)
-                .splineToConstantHeading(new Vector2d(60,-46),-Math.PI/2)
-                .splineToConstantHeading(new Vector2d(47,-46),-Math.PI/2);
+                .splineToConstantHeading(new Vector2d(35,-21),Math.PI/2,new TranslationalVelConstraint(20))
+                .splineToConstantHeading(new Vector2d(45,-8),-Math.PI/2,new TranslationalVelConstraint(20))
+                .splineToConstantHeading(new Vector2d(45, -46), -Math.PI / 2)
+                .setTangent(Math.PI/2)
+                .splineToConstantHeading(new Vector2d(45,-8),Math.PI/2)
+                .splineToConstantHeading(new Vector2d(58,-20),-Math.PI/2)
+                .splineToConstantHeading(new Vector2d(58,-46),-Math.PI/2);
                 //.lineToLinearHeading(new Pose2d(9,-35,Math.PI/2))
 
 
@@ -96,7 +104,7 @@ public class RRAuto extends LinearOpMode {
             tilt.setTargetPosition(500);
             sleep(500);
             lift.setTargetPosition(1500);
-            sleep(400);
+            sleep(300);
             claw.setPosition(0.3);
             lift.setTargetPosition(0);
             tilt.setTargetPosition(0);
