@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.PosePath;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
@@ -83,10 +84,12 @@ public class RRAuto extends LinearOpMode {
                 .setTangent(Math.PI/2)
                 .splineToConstantHeading(new Vector2d(45,-8),Math.PI/2)
                 .splineToConstantHeading(new Vector2d(58,-20),-Math.PI/2)
-                .splineToConstantHeading(new Vector2d(58,-46),-Math.PI/2);
-                //.lineToLinearHeading(new Pose2d(9,-35,Math.PI/2))
+                .splineToConstantHeading(new Vector2d(58,-46),-Math.PI/2)
+                .splineToConstantHeading(new Vector2d(37,-65),-Math.PI/2);
 
 
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(37, -65,-Math.PI/2 ))
+                .splineToConstantHeading(new Vector2d(2,-27), Math.PI/2);
 
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
@@ -98,8 +101,9 @@ public class RRAuto extends LinearOpMode {
         while (opModeIsActive() && !done) {
 
             if (isStopRequested()) return;
-            lift.setTargetPosition(2100);
+            lift.setTargetPosition(2250);
             tilt.setTargetPosition(400);
+            sleep(500);
             Actions.runBlocking(new SequentialAction(tab1.build()));
             tilt.setTargetPosition(500);
             sleep(500);
@@ -107,10 +111,14 @@ public class RRAuto extends LinearOpMode {
             sleep(300);
             claw.setPosition(0.3);
             lift.setTargetPosition(0);
-            tilt.setTargetPosition(0);
+            tilt.setTargetPosition(160);
             Actions.runBlocking(new SequentialAction(tab2.build()));
-            lift.setPower(0);
-            tilt.setPower(0);
+            claw.setPosition(.56);
+            sleep(400);
+            lift.setTargetPosition(500);
+            Actions.runBlocking(new SequentialAction(tab3.build()));
+            //drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0.2 ),0));
+            sleep(1000);
             done = true;
         }
     }
