@@ -99,7 +99,7 @@ public class RRAuto extends LinearOpMode {
         lift.setPower(1);
         tilt.setPower(1);
         while (opModeIsActive() && !done) {
-
+//
             if (isStopRequested()) return;
             lift.setTargetPosition(2250);
             tilt.setTargetPosition(400);
