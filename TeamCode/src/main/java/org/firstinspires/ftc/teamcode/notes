@@ -63,4 +63,11 @@ TrajectorySequence trajectory0 = drive.trajectorySequenceBuilder(new Pose2d(-37.
                         .splineToConstantHeading(new Vector2d(47,-40),-Math.PI/2)
                         .build());
 
+repositories {
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://maven.brott.dev/' }
+}
 
+dependencies {
+    implementation 'com.github.rh-robotics:MeepMeep:v1.1.0'
+}
