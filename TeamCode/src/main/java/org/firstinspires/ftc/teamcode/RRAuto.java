@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Arclength;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.PosePath;
@@ -25,6 +25,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 @Config
+
 @Autonomous(name = "RRAuto", group = "RoadRunner")
 public class RRAuto extends LinearOpMode {
     @Override
