@@ -21,7 +21,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+@SuppressWarnings("unused")
 
 
 @Config
@@ -46,6 +49,7 @@ public class RRAuto extends LinearOpMode {
         CRServo spin1 = hardwareMap.get(CRServo.class, "spin1");
         CRServo spin2 = hardwareMap.get(CRServo.class, "spin2");
         Servo claw = hardwareMap.get(Servo.class, "claw");
+        DistanceSensor laser = hardwareMap.get(DistanceSensor.class, "laser");
 
         lift.setDirection(DcMotor.Direction.REVERSE);
         tilt.setDirection(DcMotor.Direction.REVERSE);
@@ -78,20 +82,25 @@ public class RRAuto extends LinearOpMode {
 
         TrajectoryActionBuilder tab2 = drive.actionBuilder(new Pose2d(7, -33,Math.PI/2 ))
                 .setTangent(-Math.PI/2)
-                .splineToSplineHeading(new Pose2d(35,-31,-Math.PI/2),Math.PI/2)
-                .splineToConstantHeading(new Vector2d(35,-21),Math.PI/2,new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(45,-8),-Math.PI/2,new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(45, -46), -Math.PI / 2)
+                .splineToSplineHeading(new Pose2d(32,-31,-Math.PI/2),Math.PI/2)
+                .splineToConstantHeading(new Vector2d(32,-21),Math.PI/2,new TranslationalVelConstraint(20))
+                .splineToConstantHeading(new Vector2d(49,-8),-Math.PI/2,new TranslationalVelConstraint(20))
+                .splineToConstantHeading(new Vector2d(49, -46), -Math.PI / 2)
                 .setTangent(Math.PI/2)
-                .splineToConstantHeading(new Vector2d(45,-8),Math.PI/2)
+                .splineToConstantHeading(new Vector2d(49,-8),Math.PI/2)
                 .splineToConstantHeading(new Vector2d(58,-20),-Math.PI/2)
                 .splineToConstantHeading(new Vector2d(58,-46),-Math.PI/2)
-                .splineToConstantHeading(new Vector2d(37,-65),-Math.PI/2);
+                .splineToConstantHeading(new Vector2d(38,-65),-Math.PI/2);
 
 
         TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(37, -65,-Math.PI/2 ))
                 .setTangent(Math.PI/2)
                 .splineToSplineHeading(new Pose2d(2,-27, Math.PI/2),Math.PI/2);
+
+        TrajectoryActionBuilder tab4 = drive.actionBuilder(new Pose2d(2, -27,-Math.PI/2 ))
+                .setTangent(-Math.PI/2)
+                .splineToSplineHeading(new Pose2d(38,-65, -Math.PI/2),Math.PI/2);
+
 
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
@@ -109,25 +118,28 @@ public class RRAuto extends LinearOpMode {
             Actions.runBlocking(new SequentialAction(tab1.build()));
             tilt.setTargetPosition(500);
             sleep(500);
-            lift.setTargetPosition(1500);
-            sleep(300);
+            lift.setTargetPosition(0);
+            while(laser.getDistance(DistanceUnit.INCH)>10){}
+            sleep(150);
             claw.setPosition(0.3);
             lift.setTargetPosition(0);
             tilt.setTargetPosition(160);
             Actions.runBlocking(new SequentialAction(tab2.build()));
             claw.setPosition(.56);
             sleep(400);
-            lift.setTargetPosition(500);
+            lift.setTargetPosition(2150);
             Actions.runBlocking(new SequentialAction(tab3.build()));
-            lift.setTargetPosition(2250);
-            tilt.setTargetPosition(400);
+            tilt.setTargetPosition(150);
             sleep(500);
+            lift.setTargetPosition(0);
+            while(laser.getDistance(DistanceUnit.INCH)>10){}
+            sleep(170);
             claw.setPosition(0.3);
-            sleep(500);
-            lift.setPosition(1500);
+            lift.setTargetPosition(0);
             sleep(200);
             claw.setPosition(0.56);
             //drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0.2 ),0));
+            Actions.runBlocking(new SequentialAction(tab4.build()));
             sleep(1000);
             done = true;
         }
