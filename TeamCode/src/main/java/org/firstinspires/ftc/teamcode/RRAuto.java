@@ -119,6 +119,14 @@ public class RRAuto extends LinearOpMode {
             sleep(400);
             lift.setTargetPosition(500);
             Actions.runBlocking(new SequentialAction(tab3.build()));
+            lift.setTargetPosition(2250);
+            tilt.setTargetPosition(400);
+            sleep(500);
+            claw.setPosition(0.3);
+            sleep(500);
+            lift.setPosition(1500);
+            sleep(200);
+            claw.setPosition(0.56);
             //drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0.2 ),0));
             sleep(1000);
             done = true;
