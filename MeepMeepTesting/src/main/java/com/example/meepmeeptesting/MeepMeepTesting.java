@@ -2,7 +2,7 @@ package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.profile.VelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TranslationalVelocityConstraint;
 
 import org.rowlandhall.meepmeep.MeepMeep;
 import org.rowlandhall.meepmeep.roadrunner.DefaultBotBuilder;
@@ -25,6 +25,8 @@ public class MeepMeepTesting {
                         .splineToConstantHeading(new Vector2d(55,-20),-Math.PI/2)
                         .splineToConstantHeading(new Vector2d(55,-46),-Math.PI/2)
                         .splineToConstantHeading(new Vector2d(40,-60),-Math.PI/2)
+                        .setTangent(Math.PI/2)
+                        .splineToSplineHeading(new Pose2d(2,-27, Math.PI/2),Math.PI/2)
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)

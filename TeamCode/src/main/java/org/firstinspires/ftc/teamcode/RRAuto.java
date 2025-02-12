@@ -90,7 +90,8 @@ public class RRAuto extends LinearOpMode {
 
 
         TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(37, -65,-Math.PI/2 ))
-                .splineToConstantHeading(new Vector2d(2,-27), Math.PI/2);
+                .setTangent(Math.PI/2)
+                .splineToSplineHeading(new Pose2d(2,-27, Math.PI/2),Math.PI/2);
 
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
