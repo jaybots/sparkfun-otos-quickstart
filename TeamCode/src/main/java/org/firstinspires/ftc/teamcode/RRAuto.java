@@ -43,7 +43,10 @@ public class RRAuto extends LinearOpMode {
 
         TrajectoryActionBuilder tab4 = drive.actionBuilder(new Pose2d(2, -27,-Math.PI/2 ))
                 .setTangent(-Math.PI/2)
-                .splineToSplineHeading(new Pose2d(38,-65, -Math.PI/2),Math.PI/2);
+                //.splineToSplineHeading(new Pose2d(38,-65, -Math.PI/2),Math.PI/2);
+                //Using splinetolinearheading in a attempt to prevent the odd run into the wall during T4
+                //If does not work use .lineToX(38) This will solve for y auto. A turn would need added
+                .splineToLinearHeading(Pose2d(38,-65,-Math.PI/2),Math.PI/2);
 
 
         while (!isStopRequested() && !opModeIsActive()) {
