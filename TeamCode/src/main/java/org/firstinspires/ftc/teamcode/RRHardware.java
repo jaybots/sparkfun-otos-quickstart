@@ -33,7 +33,7 @@ public class RRHardware {
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         tilt = rrMap.get(DcMotor.class, "tilt");
-        tilt.setDirection(DcMotor.Direction.FORWARD);
+        tilt.setDirection(DcMotor.Direction.REVERSE);
         tilt.setPower(0);
         tilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         tilt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -64,10 +64,10 @@ public class RRHardware {
     }
 
     public void releaseSpecimen(){
+        lift.setPower(0.75);
         lift.setTargetPosition(0);
-        while (laser.getDistance(DistanceUnit.INCH)>10){
+        while (laser.getDistance(DistanceUnit.INCH)>12){
         }
-        sleep(170);
         claw.setPosition(0.3);
     }
 
