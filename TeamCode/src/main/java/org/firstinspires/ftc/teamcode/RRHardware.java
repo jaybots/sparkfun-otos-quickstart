@@ -19,6 +19,7 @@ public class RRHardware {
     public DcMotor lift = null;
     public DcMotor tilt = null;
     public Servo claw = null;
+    public Servo twist = null;
     public CRServo spin1 = null;
     public CRServo spin2 = null;
     public DistanceSensor laser = null;
@@ -53,6 +54,8 @@ public class RRHardware {
         claw = rrMap.get(Servo.class, "claw");
         claw.setPosition(0.56); //closed  (0.30 is open);
 
+        twist = rrMap.get(Servo.class, "twist");
+
         spin1 = rrMap.get(CRServo.class, "spin1");
         spin2 = rrMap.get(CRServo.class, "spin2");
 
@@ -74,9 +77,10 @@ public class RRHardware {
     }
 
     public void releaseSpecimen(){
-        lift.setPower(0.75);
+        lift.setPower(.75);
         lift.setTargetPosition(0);
-        while (laser.getDistance(DistanceUnit.INCH)>12){
+        timer.reset();
+        while (lift.getCurrentPosition()>1750){
         }
         claw.setPosition(0.3);
     }

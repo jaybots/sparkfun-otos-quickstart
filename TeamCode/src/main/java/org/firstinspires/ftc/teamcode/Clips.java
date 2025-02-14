@@ -31,7 +31,7 @@ public class Clips extends LinearOpMode {
                 .splineToSplineHeading(new Pose2d(33,-34,-Math.PI/2),Math.PI/2)
                 .splineToConstantHeading(new Vector2d(33,-21),Math.PI/2,new TranslationalVelConstraint(20))
                 .splineToConstantHeading(new Vector2d(47,-8),-Math.PI/2,new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(47, -40), -Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(47, -42), -Math.PI / 2)
                 .setTangent(Math.PI/2)
                 .splineToConstantHeading(new Vector2d(38,-52),-Math.PI/2);
 
@@ -57,10 +57,10 @@ public class Clips extends LinearOpMode {
         rr.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
-            rr.claw.setPosition(1);
-            rr.lift.setTargetPosition(2200);
+            rr.twist.setPosition(1);
+            rr.lift.setTargetPosition(2180);
             rr.tilt.setTargetPosition(380);
-            sleep(200);
+            //sleep(200);
             Actions.runBlocking(new SequentialAction(tab1.build()));
             sleep(300);
             rr.releaseSpecimen();
@@ -71,23 +71,22 @@ public class Clips extends LinearOpMode {
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
             rr.grabSpecimen();
-            rr.lift.setTargetPosition(2160);
+            rr.lift.setTargetPosition(2050);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
             rr.releaseSpecimen();
             sleep(200);
-            rr.claw.setPosition(0.56);
             Actions.runBlocking(new SequentialAction(tab4.build()));
             sleep(100);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(2,0 ),0));
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
             rr.grabSpecimen();
+            rr.lift.setTargetPosition(2050);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
             rr.releaseSpecimen();
             sleep(200);
-            rr.claw.setPosition(0.56);
             Actions.runBlocking(new SequentialAction(tab5.build()));
             done = true;
         }

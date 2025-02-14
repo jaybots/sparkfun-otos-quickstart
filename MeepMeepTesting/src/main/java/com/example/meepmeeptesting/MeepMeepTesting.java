@@ -18,8 +18,11 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-7, -61, Math.toRadians(90)))
 
                         .lineTo(new Vector2d(-7,-30))
-                        .splineToConstantHeading(new Vector2d(-14,-40),Math.PI/2)
-                        .splineToConstantHeading(new Vector2d(-33,-21),Math.PI/2)
+                        .lineTo(new Vector2d(-7,-40))
+                        .lineTo(new Vector2d(-36,-40))
+                        .lineTo(new Vector2d(-36,-24))
+                        //.splineToConstantHeading(new Vector2d(-14,-40),Math.PI/2)
+                        //.splineToConstantHeading(new Vector2d(-33,-21),Math.PI/2)
                         .splineToConstantHeading(new Vector2d(-47,-8),-Math.PI/2)
                         .splineToConstantHeading(new Vector2d(-47, -56), -Math.PI / 2)
                         .splineToConstantHeading(new Vector2d(-47, -6), -Math.PI / 2)
