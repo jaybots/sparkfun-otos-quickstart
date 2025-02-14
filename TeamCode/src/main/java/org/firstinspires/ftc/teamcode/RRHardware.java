@@ -5,6 +5,7 @@ import static java.lang.Thread.sleep;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class RRHardware {
     public ElapsedTime timer = new ElapsedTime();
+    public DcMotor hang = null;
     public DcMotor lift = null;
     public DcMotor tilt = null;
     public Servo claw = null;
@@ -23,6 +25,14 @@ public class RRHardware {
     HardwareMap rrMap = null;
     public void init(HardwareMap arrMap){
         rrMap = arrMap;
+
+        hang = rrMap.get(DcMotor.class,"hang");
+        hang.setDirection(DcMotor.Direction.FORWARD);
+        hang.setPower(0);
+        hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        hang.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hang.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
         lift = rrMap.get(DcMotor.class,"lift");
         lift.setDirection(DcMotor.Direction.REVERSE);

@@ -13,8 +13,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.lang.Math;
 
 
-@Autonomous(name = "RRAuto", group = "RoadRunner")
-public class RRAuto extends LinearOpMode {
+@Autonomous(name = "Clips", group = "Right (Red/Blue blocks)")
+public class Clips extends LinearOpMode {
     RRHardware rr = new RRHardware();
 
     public void runOpMode() {
@@ -43,6 +43,10 @@ public class RRAuto extends LinearOpMode {
                 .setTangent(-Math.PI/2)
                 .splineToSplineHeading(new Pose2d(38,-52, -Math.PI/2),-Math.PI/2);
 
+        TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(2, -27,Math.PI/2 ))
+                .setTangent(-Math.PI/2)
+                .splineToSplineHeading(new Pose2d(38,-52, Math.PI/2),0);
+
 
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
@@ -53,41 +57,38 @@ public class RRAuto extends LinearOpMode {
         rr.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
-            //rr.claw.setPosition(1);
-            //rr.lift.setTargetPosition(2200);
-            //rr.tilt.setTargetPosition(380);
+            rr.claw.setPosition(1);
+            rr.lift.setTargetPosition(2200);
+            rr.tilt.setTargetPosition(380);
             sleep(200);
             Actions.runBlocking(new SequentialAction(tab1.build()));
             sleep(300);
-            //rr.releaseSpecimen();
-            //rr.tilt.setTargetPosition(150);
+            rr.releaseSpecimen();
+            rr.tilt.setTargetPosition(150);
             Actions.runBlocking(new SequentialAction(tab2.build()));
             sleep(100);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(2,0 ),0));
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
-            //rr.grabSpecimen();
-            //rr.lift.setTargetPosition(2160);
+            rr.grabSpecimen();
+            rr.lift.setTargetPosition(2160);
             Actions.runBlocking(new SequentialAction(tab3.build()));
-
             sleep(500);
-            //rr.releaseSpecimen();
+            rr.releaseSpecimen();
             sleep(200);
-            //rr.claw.setPosition(0.56);
-            //drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0.2 ),0));
+            rr.claw.setPosition(0.56);
             Actions.runBlocking(new SequentialAction(tab4.build()));
             sleep(100);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(2,0 ),0));
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
-            //rr.grabSpecimen();
+            rr.grabSpecimen();
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
-            //rr.releaseSpecimen();
+            rr.releaseSpecimen();
             sleep(200);
-            //rr.claw.setPosition(0.56);
-            //drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0.2 ),0));
-            Actions.runBlocking(new SequentialAction(tab4.build()));
+            rr.claw.setPosition(0.56);
+            Actions.runBlocking(new SequentialAction(tab5.build()));
             done = true;
         }
     }
