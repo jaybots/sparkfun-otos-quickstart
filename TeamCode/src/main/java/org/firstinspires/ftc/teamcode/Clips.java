@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.lang.Math;
 
 
-@Autonomous(name = "Clips", group = "Right (Red/Blue blocks)")
+@Autonomous(name = "Clips", group = "Right Side (Clip Red/Blue blocks)")
 public class Clips extends LinearOpMode {
     RRHardware rr = new RRHardware();
 
@@ -60,7 +60,7 @@ public class Clips extends LinearOpMode {
             rr.twist.setPosition(1);
             rr.lift.setTargetPosition(2180);
             rr.tilt.setTargetPosition(380);
-            //sleep(200);
+            sleep(200);
             Actions.runBlocking(new SequentialAction(tab1.build()));
             sleep(300);
             rr.releaseSpecimen();
@@ -72,6 +72,7 @@ public class Clips extends LinearOpMode {
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
             rr.grabSpecimen();
             rr.lift.setTargetPosition(2050);
+            sleep(100);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
             rr.releaseSpecimen();
@@ -83,6 +84,7 @@ public class Clips extends LinearOpMode {
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
             rr.grabSpecimen();
             rr.lift.setTargetPosition(2050);
+            sleep(100);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
             rr.releaseSpecimen();

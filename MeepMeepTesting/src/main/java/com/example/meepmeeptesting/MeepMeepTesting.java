@@ -15,25 +15,10 @@ public class MeepMeepTesting {
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 //Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(50, 50, Math.toRadians(180), Math.toRadians(180), 14)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-7, -61, Math.toRadians(90)))
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-7, -61, Math.toRadians(180)))
+                        .splineTo(new Vector2d(-55,-55),Math.toRadians(225))
 
-                        .lineTo(new Vector2d(-7,-30))
-                        .setTangent(-Math.PI/2)
-                        .splineTo(new Vector2d(-19,-35),Math.PI)
-                        .splineTo(new Vector2d(-37,-8),Math.toRadians(85))
-                        .setTangent(Math.toRadians(265))
-                        .splineTo(new Vector2d(-42,-25),Math.toRadians(265))
-                        .splineTo(new Vector2d(-44,-55),Math.toRadians(265))
-                        .setTangent(Math.toRadians(85))
-                        .splineTo(new Vector2d(-46,-8),Math.toRadians(85))
-                        .setTangent(Math.toRadians(265))
-                        .splineTo(new Vector2d(-58,-45),Math.toRadians(270))
-                        .setTangent(Math.toRadians(90))
-                        .splineTo(new Vector2d(-50,0),Math.toRadians(90))
-                        .setTangent(Math.toRadians(270))
-                        .splineToConstantHeading(new Vector2d(-60,-10),Math.toRadians(270))
-                        .splineTo(new Vector2d(-60,-42),Math.toRadians(270))
-                        .setTangent(Math.toRadians(90))
+                        .setTangent(Math.toRadians(45))
                         .splineTo(new Vector2d(-30,-9),Math.toRadians(0))
                         .build());
 
@@ -44,3 +29,25 @@ public class MeepMeepTesting {
                 .start();
     }
 }
+
+
+// yellow push
+// .lineTo(new Vector2d(-7,-30))
+//        .setTangent(-Math.PI/2)
+//                        .splineTo(new Vector2d(-19,-35),Math.PI)
+//        .splineTo(new Vector2d(-37,-8),Math.toRadians(85))
+//        .setTangent(Math.toRadians(265))
+//        .splineTo(new Vector2d(-42,-25),Math.toRadians(265))
+//        .splineTo(new Vector2d(-44,-55),Math.toRadians(265))
+//        .setTangent(Math.toRadians(85))
+//        .splineTo(new Vector2d(-46,-8),Math.toRadians(85))
+//        .setTangent(Math.toRadians(265))
+//        .splineTo(new Vector2d(-58,-45),Math.toRadians(270))
+//        .setTangent(Math.toRadians(90))
+//        .splineTo(new Vector2d(-50,0),Math.toRadians(90))
+//        .setTangent(Math.toRadians(270))
+//        .splineToConstantHeading(new Vector2d(-60,-10),Math.toRadians(270))
+//        .splineTo(new Vector2d(-60,-42),Math.toRadians(270))
+//        .setTangent(Math.toRadians(90))
+//        .splineTo(new Vector2d(-30,-9),Math.toRadians(0))
+//        .build());

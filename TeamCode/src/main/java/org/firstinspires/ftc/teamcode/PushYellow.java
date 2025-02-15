@@ -3,20 +3,17 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-@Autonomous(name = "Left (clip color then push yellow)")
-public class Basket extends LinearOpMode {
+@Autonomous(name = "Left Side (clip color then push yellow)")
+public class PushYellow extends LinearOpMode {
     RRHardware rr = new RRHardware();
-    double fast = 30;
-    double slow = 10;
+
 
     public void runOpMode() {
         rr.init(hardwareMap);
@@ -57,7 +54,7 @@ public class Basket extends LinearOpMode {
         rr.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
-            rr.claw.setPosition(1);
+            rr.twist.setPosition(1);
             //rr.lift.setTargetPosition(2180);
             //rr.tilt.setTargetPosition(380);
             sleep(500);
