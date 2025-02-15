@@ -1,0 +1,78 @@
+package org.firstinspires.ftc.teamcode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import java.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import java.util.Locale;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import java.lang.Math;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+
+@Autonomous(name="LeftPush (push 3 yellow blocks)", group = "Left")
+public class LeftPush extends LinearOpMode
+{
+    HardwareBot robot = new HardwareBot();
+    public void runOpMode() {
+        robot.init(hardwareMap);
+        SparkFunOTOS.Pose2D pos;
+        boolean done = false;
+
+        robot.liftPosition = robot.lift.getCurrentPosition();
+        robot.tiltPosition = robot.tilt.getCurrentPosition();
+
+        robot.lift.setPower(0);
+        robot.lift.setTargetPosition(0);
+        robot.tilt.setPower(0.1);
+        robot.tilt.setTargetPosition(0);
+
+
+        // Wait for the game to start (driver presses PLAY)
+        while (!isStarted()) {
+            pos = robot.odo.getPosition();
+            telemetry.addData("X coordinate", pos.x);
+            telemetry.addData("Y coordinate", pos.y);
+            telemetry.addData("Heading angle", pos.h);
+            telemetry.addData("lift", robot.liftPosition);
+            telemetry.addData("tilt", robot.tiltPosition);
+            telemetry.update();
+        }
+        robot.tilt.setPower(1);
+        while (opModeIsActive() && done == false){
+
+
+            //firstSpecimen drives to submersible, clips block on, and lowers lift
+            robot.firstSpecimen();
+            robot.left(10,.4);
+            robot.forward(20,.4);
+            robot.left(8,.4);
+            robot.cw(8);
+            robot.back(40,.4);
+            robot.ccw(6);
+            robot.forward(40,.4);
+            robot.left(12,.4);
+            robot.back(35,.4);
+            robot.forward(33, .4);
+            robot.leftTime(1500, .3);
+            robot.back(26,.4);
+            robot.forward(28,.4);
+            robot.right(2,.4);
+            robot.left90();
+            robot.back(14,1);
+            robot.hang.setPower(-1);
+            sleep(1200);
+            robot.hang.setPower(0);
+            done = true;
+
+        }//end of while opmode is active
+    }//end of run opmode
+}//end of class
