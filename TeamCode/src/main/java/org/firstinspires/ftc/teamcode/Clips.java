@@ -15,10 +15,10 @@ import java.lang.Math;
 
 @Autonomous(name = "Clips", group = "Right Side (Clip Red/Blue blocks)")
 public class Clips extends LinearOpMode {
-    RRHardware rr = new RRHardware();
+    HardwareBot robot = new HardwareBot();
 
     public void runOpMode() {
-        rr.init(hardwareMap);
+        robot.init(hardwareMap);
 
         Pose2d initialPose = new Pose2d(7, -61, Math.toRadians(90));
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
@@ -53,41 +53,41 @@ public class Clips extends LinearOpMode {
             telemetry.addData("ready to","start");
         }
         boolean done = false;
-        rr.lift.setPower(1);
-        rr.tilt.setPower(1);
+        robot.lift.setPower(1);
+        robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
-            rr.twist.setPosition(1);
-            rr.lift.setTargetPosition(2180);
-            rr.tilt.setTargetPosition(380);
+            robot.twist.setPosition(1);
+            robot.lift.setTargetPosition(2180);
+            robot.tilt.setTargetPosition(380);
             sleep(200);
             Actions.runBlocking(new SequentialAction(tab1.build()));
             sleep(300);
-            rr.releaseSpecimen();
-            rr.tilt.setTargetPosition(150);
+            robot.releaseSpecimen();
+            robot.tilt.setTargetPosition(150);
             Actions.runBlocking(new SequentialAction(tab2.build()));
             sleep(100);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(2,0 ),0));
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
-            rr.grabSpecimen();
-            rr.lift.setTargetPosition(2050);
+            robot.grabSpecimen();
+            robot.lift.setTargetPosition(2050);
             sleep(100);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
-            rr.releaseSpecimen();
+            robot.releaseSpecimen();
             sleep(200);
             Actions.runBlocking(new SequentialAction(tab4.build()));
             sleep(100);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(2,0 ),0));
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
-            rr.grabSpecimen();
-            rr.lift.setTargetPosition(2050);
+            robot.grabSpecimen();
+            robot.lift.setTargetPosition(2050);
             sleep(100);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
-            rr.releaseSpecimen();
+            robot.releaseSpecimen();
             sleep(200);
             Actions.runBlocking(new SequentialAction(tab5.build()));
             done = true;

@@ -244,21 +244,12 @@ public class Mec extends LinearOpMode
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
 
-
-
             if (gamepad2.right_bumper && robot.tiltPosition<200 && robot.liftPosition < 200 ){
                 robot.grabSpecimen();
                 robot.twistPosition = 1;
                 robot.flip();
             }
 
-
-
-
-        } //ends while opMode is active loop
-    }  //brace ends opMode
-
-
-
-
-} //brace ends class
+        } //ends "while opMode is active" loop
+    }  //brace ends runOpMode method
+} //brace ends Mec.java class

@@ -12,12 +12,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name = "Left Side (yellow to high basket)")
 public class HighBasket extends LinearOpMode {
-    RRHardware rr = new RRHardware();
-    double fast = 30;
-    double slow = 10;
+    HardwareBot robot = new HardwareBot();
 
     public void runOpMode() {
-        rr.init(hardwareMap);
+        robot.init(hardwareMap);
 
         Pose2d initialPose = new Pose2d(-7, -61, Math.toRadians(90));
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
@@ -36,33 +34,33 @@ public class HighBasket extends LinearOpMode {
             telemetry.addData("ready to","start");
         }
         boolean done = false;
-        rr.lift.setPower(1);
-        rr.tilt.setPower(1);
+        robot.lift.setPower(1);
+        robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
             sleep(1500);
             Actions.runBlocking(new SequentialAction(tab1.build()));
-            //rr.lift.setTargetPosition(3500);
+            //robot.lift.setTargetPosition(3500);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(1,0 ),0));
             sleep(2000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0 ),0));
-            rr.spin1.setPower(-1);
-            rr.spin2.setPower(1);
+            robot.spin1.setPower(-1);
+            robot.spin2.setPower(1);
             sleep(1500);
-            rr.spin1.setPower(0);
-            rr.spin2.setPower(0);
+            robot.spin1.setPower(0);
+            robot.spin2.setPower(0);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-1,0 ),0));
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0 ),0));
-            //rr.lift.setTargetPosition(0)
+            //robot.lift.setTargetPosition(0)
             sleep(2000);
             Actions.runBlocking(new SequentialAction(tab2.build()));
             sleep(100);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-1,0 ),0));
             sleep(3000);
-            rr.hang.setPower(-.5);
+            robot.hang.setPower(-.5);
             sleep(2500);
-            rr.hang.setPower(0);
+            robot.hang.setPower(0);
             done = true;
         }
     }
