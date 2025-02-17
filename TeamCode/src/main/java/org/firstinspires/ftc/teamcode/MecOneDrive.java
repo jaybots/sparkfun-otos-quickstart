@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -11,8 +13,8 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import java.lang.Math;
 
 
-@TeleOp(name="Mec")
-public class Mec extends LinearOpMode
+@TeleOp(name="MecOneDrive")
+public class MecOneDrive extends LinearOpMode
 {
     HardwareBot robot = new HardwareBot();
 
@@ -22,7 +24,7 @@ public class Mec extends LinearOpMode
     boolean grab = false;
     boolean release = false;
     ElapsedTime timer  = new ElapsedTime();
-
+    enum Mode {ADRIVE, BSUB, XBASKET, YBAR}
     @Override
     public void runOpMode() {
 
@@ -31,10 +33,20 @@ public class Mec extends LinearOpMode
         Pose2d initialPose = new Pose2d(7, -61, Math.toRadians(90));
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
+        Gamepad currentGamepad1 = new Gamepad();
+        Gamepad currentGamepad2 = new Gamepad();
+
+        Gamepad previousGamepad1 = new Gamepad();
+        Gamepad previousGamepad2 = new Gamepad();
+
+        TrajectoryActionBuilder right1 = drive.actionBuilder(new Pose2d(1, 0,0 )).lineToX(1);
+        TrajectoryActionBuilder left1 = drive.actionBuilder(new Pose2d(-1, 0,0 )).lineToX(1);
+        TrajectoryActionBuilder forward1 = drive.actionBuilder(new Pose2d(0, 1,0 )).lineToX(1);
+        TrajectoryActionBuilder back1 = drive.actionBuilder(new Pose2d(0, -1,0 )).lineToX(1);
 
         double speedFactor;
         int maxExt = 1697;
-
+        Mode driveMode = Mode.ADRIVE;
 
         // The while loop below runs until Play is pressed
         // Current info is displayed
@@ -58,8 +70,25 @@ public class Mec extends LinearOpMode
 
         while (opModeIsActive()) {
 
-            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
-            telemetry.update();
+            previousGamepad1.copy(currentGamepad1);
+            previousGamepad2.copy(currentGamepad2);
+            currentGamepad1.copy(gamepad1);
+            currentGamepad2.copy(gamepad2);
+
+            if (currentGamepad2.a) driveMode = Mode.ADRIVE;
+            if (currentGamepad2.b) driveMode = Mode.BSUB;
+            if (currentGamepad2.x) driveMode = Mode.XBASKET;
+            if (currentGamepad2.y) driveMode = Mode.YBAR;
+
+            //grab is set to true if right trigger is squeezed
+            //it activates all intake mechanisms (claw and spinner)
+            grab = currentGamepad1.right_trigger > 0.3;
+            liftControl = currentGamepad1.left_stick_y;
+            twistControl = currentGamepad1.right_stick_x;
+
+            //release is set to true if left trigger is squeezed
+            //it activates all outtake mechanisms (claw and spinner)
+            release = currentGamepad1.left_trigger > 0.3;
 
             //reset lift encoder if amps are high and it's in down position
             if (robot.liftPosition < 100 && liftControl > -0.3 && robot.lift.getCurrent(CurrentUnit.AMPS) > 7) {
@@ -80,20 +109,34 @@ public class Mec extends LinearOpMode
             robot.tilt.setTargetPosition(robot.tiltTarget);
             robot.lift.setTargetPosition(robot.liftTarget);
 
-
             robot.tiltPosition = robot.tilt.getCurrentPosition();
             robot.liftPosition = robot.lift.getCurrentPosition();
 
-            liftControl = gamepad2.left_stick_y;
-            twistControl = gamepad2.right_stick_x;
+            switch  (driveMode){
+                case ADRIVE:
 
-            //grab is set to true if right trigger is squeezed
-            //it activates all intake mechanisms (claw and spinner)
-            grab = gamepad2.right_trigger > 0.3;
+                break;
+            }
 
-            //release is set to true if left trigger is squeezed
-            //it activates all outtake mechanisms (claw and spinner)
-            release = gamepad2.left_trigger > 0.3;
+            switch  (driveMode){
+                case BSUB:
+
+                    break;
+            }
+
+            switch  (driveMode){
+                case XBASKET:
+
+                    break;
+            }
+
+
+            switch  (driveMode){
+                case YBAR:
+
+                    break;
+            }
+
 
             if (twistControl < -0.3 && robot.twistPosition < 1){
                 robot.twistPosition += 0.01;
@@ -131,9 +174,6 @@ public class Mec extends LinearOpMode
                 //allow lift to go down below zero if 'back' is held
                 if (!gamepad2.back) robot.liftTarget = Math.max(0,robot.liftTarget);
             }
-
-
-
 
             //rotate tilt inward (up toward vertical)
             if (gamepad2.dpad_down) {

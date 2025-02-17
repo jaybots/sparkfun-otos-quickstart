@@ -261,10 +261,6 @@ public class HardwareBot
         stopWheels();
     }
 
-
-
-
-
     /**
      * Drives right using optical odometer
      * @param dist in inches
