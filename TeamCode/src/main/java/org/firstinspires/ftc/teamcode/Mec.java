@@ -252,8 +252,9 @@ public class Mec extends LinearOpMode
 
             if (gamepad2.right_bumper && robot.tiltPosition<200 && robot.liftPosition < 200 ){
                 robot.grabSpecimen();
-                robot.twistPosition = 1;
-                robot.flip();
+
+                //robot.twistPosition = 1;
+                //robot.flip();
             }
 
         } //ends "while opMode is active" loop

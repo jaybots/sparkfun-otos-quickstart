@@ -133,12 +133,20 @@ public class HardwareBot
 
     }
 
-
-    public void grabSpecimen(){
-        claw.setPosition(clawOpen);
+    public boolean grabSpecimen(){
+        claw.setPosition(clawClosed);
         sleep(400);
+        liftTarget = 500;
         lift.setTargetPosition(500);
         sleep(200);
+        if (laser.getDistance(DistanceUnit.INCH) > 10){
+            claw.setPosition(clawOpen);
+            sleep(1000);
+            liftTarget = 0;
+            lift.setTargetPosition(0);
+            return false;
+        }
+        return true;
     }
 
     /**
