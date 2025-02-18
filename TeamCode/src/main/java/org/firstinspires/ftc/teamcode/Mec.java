@@ -41,6 +41,7 @@ public class Mec extends LinearOpMode
         while (!isStarted() && !isStopRequested()){
             //robot.claw.setPosition(robot.clawOpen);
             pos = robot.odo.getPosition();
+            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
             telemetry.addData("X coordinate", pos.x);
             telemetry.addData("Y coordinate", pos.y);
             telemetry.addData("Heading angle", pos.h);

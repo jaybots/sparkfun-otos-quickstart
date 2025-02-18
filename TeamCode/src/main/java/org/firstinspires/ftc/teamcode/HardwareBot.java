@@ -35,10 +35,8 @@ public class HardwareBot
     public ServoImplEx twist = null;
     public DistanceSensor laser = null;
     public SparkFunOTOS odo;
-    double spin1zero = 0.00;
-    double spin2zero = 0.00;
-    public double clawOpen = 0.3;
-    public double clawClosed = 0.56;
+    public double clawOpen = 0.2;
+    public double clawClosed = 0.55;
     public double liftPower = 1;
     public double tiltPower = 0.7;
     public int liftPosition = 0;
@@ -94,7 +92,7 @@ public class HardwareBot
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         lift.setDirection(DcMotor.Direction.REVERSE);
         tilt.setDirection(DcMotor.Direction.REVERSE);
-        hang.setDirection(DcMotor.Direction.FORWARD);
+        hang.setDirection(DcMotor.Direction.REVERSE);
         hang.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         tilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -107,8 +105,8 @@ public class HardwareBot
         lift.setPower(0);
         tilt.setPower(0);
         hang.setPower(0);
-        spin1.setPower(spin1zero);
-        spin2.setPower(spin2zero);
+        spin1.setPower(0);
+        spin2.setPower(0);
         claw.setPosition(clawClosed);
 
 
@@ -159,8 +157,8 @@ public class HardwareBot
      * Stops the intake wheels
      */
     public void spinStop(){
-        spin1.setPower(spin1zero);
-        spin2.setPower(spin2zero);
+        spin1.setPower(0);
+        spin2.setPower(0);
     }
     /**
      * Spins the intake wheels to pull block in
