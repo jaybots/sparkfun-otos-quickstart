@@ -22,6 +22,9 @@ public class Mec extends LinearOpMode
     boolean grab = false;
     boolean release = false;
     ElapsedTime timer  = new ElapsedTime();
+    boolean driveControls = true;
+    boolean grabberControls = false;
+    boolean extraControls = false;
 
     @Override
     public void runOpMode() {
@@ -89,11 +92,11 @@ public class Mec extends LinearOpMode
 
             //grab is set to true if right trigger is squeezed
             //it activates all intake mechanisms (claw and spinner)
-            grab = gamepad2.right_trigger > 0.3;
+            grab = gamepad1.right_trigger > 0.3 && grabberControl == true;
 
             //release is set to true if left trigger is squeezed
             //it activates all outtake mechanisms (claw and spinner)
-            release = gamepad2.left_trigger > 0.3;
+            release = gamepad1.left_trigger > 0.3 && grabberControl == true;
 
             if (twistControl < -0.3 && robot.twistPosition < 1){
                 robot.twistPosition += 0.01;
@@ -103,48 +106,48 @@ public class Mec extends LinearOpMode
                 robot.twistPosition -= 0.01;
             }
 
-            else if (gamepad2.right_stick_y < -0.3) robot.twistPosition = robot.twistZero;
+            else if (gamepad2.right_stick_y < -0.3 && grabberControl == true) robot.twistPosition = robot.twistZero;
 
             robot.twist.setPosition(robot.twistPosition);
 
-            if (gamepad2.left_bumper){
+            if (gamepad1.left_bumper  && grabberControl == true){
                 robot.releaseSpecimen();
                 robot.liftTarget = 0;
             }
 
-            if (gamepad1.x) {
+            if (gamepad1.x && driveControl == true) {
                 robot.hang.setPower(1);
             }
-            else if (gamepad1.y){
+            else if (gamepad1.y && driveControl == true){
                 robot.hang.setPower(-1);
                 robot.tiltTarget = 400;
             }
             else robot.hang.setPower(0);
 
             //going up by joystick
-            if (liftControl < -0.3 && (robot.liftTarget < robot.maxHeight || gamepad2.back)){
+            if (liftControl < -0.3 && (robot.liftTarget < robot.maxHeight && grabberControl == true || gamepad2.back && grabberControls == true)){
                 robot.liftTarget += 20;
             }
             //going down by joystick
-            else if (liftControl  > 0.3 ){
+            else if (liftControl  > 0.3 && grabberControls == true){
                 robot.liftTarget -=20;
                 //allow lift to go down below zero if 'back' is held
-                if (!gamepad2.back) robot.liftTarget = Math.max(0,robot.liftTarget);
+                if (!gamepad1.back) robot.liftTarget = Math.max(0,robot.liftTarget);
             }
 
 
 
 
             //rotate tilt inward (up toward vertical)
-            if (gamepad2.dpad_down) {
+            if (gamepad1.dpad_down && grabberControls == true) {
                 robot.tiltTarget = Math.max(0,robot.tiltTarget - 15);
             }
             //rotate tilt away (down toward floor)
-            else if (gamepad2.dpad_up && (robot.tiltPosition < 200 || robot.liftPosition < maxExt *.9 )){
+            else if (gamepad1.dpad_up && (robot.tiltPosition < 200 && grabberControl == true || robot.liftPosition < maxExt *.9 && grabberControl == true )){
                 robot.tiltTarget = Math.min(robot.tiltTarget + 15, robot.floor);
             }
 
-            if (grab && robot.tiltPosition < 300){
+            if (grab && robot.tiltPosition < 300 && grabberControl == true){
                 //grab with claw
                 robot.claw.setPosition(robot.clawClosed);
                 robot.spinIn();
@@ -156,13 +159,13 @@ public class Mec extends LinearOpMode
                 robot.spinIn();
             }
 
-            if (gamepad2.a){
+            if (gamepad1.a && grabberControl == true){
                 robot.liftTarget = 0;
             }
 
 
             //lift various amounts
-            if (gamepad2.x){
+            if (gamepad1.x && grabberControl == true){
 
                 if  (robot.liftPosition < 1900 && robot.tiltPosition < 100){
                     robot.liftTarget = 2000;
@@ -176,7 +179,7 @@ public class Mec extends LinearOpMode
                 }
             }
             //tilt various amounts, timer enforces 0.5 second between changes
-            if (gamepad2.y && timer.milliseconds()>500){
+            if (gamepad1.y && timer.milliseconds()>500 && grabberControl == true){
                 timer.reset();
                 if  (robot.tiltPosition < 100 || robot.tiltPosition > robot.floor*.9){
                     robot.tiltTarget = (int)(robot.floor*.75);
