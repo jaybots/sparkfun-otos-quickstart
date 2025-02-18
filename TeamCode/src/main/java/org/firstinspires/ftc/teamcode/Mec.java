@@ -87,8 +87,8 @@ public class Mec extends LinearOpMode
             robot.tiltPosition = robot.tilt.getCurrentPosition();
             robot.liftPosition = robot.lift.getCurrentPosition();
 
-            liftControl = gamepad2.left_stick_y;
-            twistControl = gamepad2.right_stick_x;
+            liftControl = gamepad1.left_stick_y && grabberControl == true;
+            twistControl = gamepad1.right_stick_x && grabberControl == true;
 
             //grab is set to true if right trigger is squeezed
             //it activates all intake mechanisms (claw and spinner)
@@ -98,15 +98,24 @@ public class Mec extends LinearOpMode
             //it activates all outtake mechanisms (claw and spinner)
             release = gamepad1.left_trigger > 0.3 && grabberControl == true;
 
-            if (twistControl < -0.3 && robot.twistPosition < 1){
+            if (gamepad2.x){
+                grabberControls == true;
+                drvieControls == false;
+            }
+            if (gamepad2.y){
+                driveControls == true;
+                grabberControls == false;
+            }
+
+            if (twistControl < -0.3 && robot.twistPosition < 1 && driveControl == true){
                 robot.twistPosition += 0.01;
             }
 
-            else if (twistControl > 0.3 && robot.twistPosition > 0){
+            else if (twistControl > 0.3 && robot.twistPosition > 0 && driveControl == true){
                 robot.twistPosition -= 0.01;
             }
 
-            else if (gamepad2.right_stick_y < -0.3 && grabberControl == true) robot.twistPosition = robot.twistZero;
+            else if (gamepad2.right_stick_y < -0.3 && driveControl == true) robot.twistPosition = robot.twistZero;
 
             robot.twist.setPosition(robot.twistPosition);
 
@@ -191,7 +200,7 @@ public class Mec extends LinearOpMode
             }
 
             //tilt back to vertical
-            if (gamepad2.b ){
+            if (gamepad1.b && grabberControls == true){
                 robot.tiltTarget = 0;
             }
 
@@ -209,13 +218,13 @@ public class Mec extends LinearOpMode
             double drv  = -gamepad1.left_stick_y;
             double strafe = gamepad1.left_stick_x;
             double twist  = gamepad1.right_stick_x;
-            if (gamepad1.dpad_up) drv = 0.5;
-            if (gamepad1.dpad_down) drv = -0.5;
-            if (gamepad1.dpad_right) strafe = 0.5;
-            if (gamepad1.dpad_left) strafe = -0.5;
+            if (gamepad1.dpad_up && driveControl == true) drv = 0.5;
+            if (gamepad1.dpad_down && driveControl == true) drv = -0.5;
+            if (gamepad1.dpad_right && driveControl == true) strafe = 0.5;
+            if (gamepad1.dpad_left && driveControl == true) strafe = -0.5;
             //Fine controls for movement on the ACCESSORIES side
-            if(gamepad2.dpad_right) strafe = 0.4;
-            if(gamepad2.dpad_left) strafe = -0.4;
+            if(gamepad1.dpad_right && grabberControl == true) strafe = 0.4;
+            if(gamepad1.dpad_left && grabberControl == true) strafe = -0.4;
 
             //lower wheel power due to lift tilted down to ground
             if (robot.tiltPosition > 400 || robot.liftPosition > robot.maxHeight*.9){
@@ -252,7 +261,7 @@ public class Mec extends LinearOpMode
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
 
-            if (gamepad2.right_bumper && robot.tiltPosition<200 && robot.liftPosition < 200 ){
+            if (gamepad1.right_bumper && robot.tiltPosition<200 && robot.liftPosition < 200 && grabberControl == true){
                 robot.grabSpecimen();
                 robot.twistPosition = 1;
                 robot.flip();
