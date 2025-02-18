@@ -16,7 +16,7 @@ public class Mec extends LinearOpMode
 {
     HardwareBot robot = new HardwareBot();
 
-
+    int barHeight = 2150;
     double liftControl = 0;
     double twistControl = 0;
     boolean grab = false;
@@ -250,11 +250,15 @@ public class Mec extends LinearOpMode
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
 
-            if (gamepad2.right_bumper && robot.tiltPosition<200 && robot.liftPosition < 200 ){
-                robot.grabSpecimen();
-
-                //robot.twistPosition = 1;
-                //robot.flip();
+            if (gamepad2.right_bumper && robot.laser.getDistance(DistanceUnit.INCH) < 3 ){
+                if (robot.grabSpecimen()) {
+                    robot.flip();
+                    robot.liftTarget = barHeight;
+                }
+                else {
+                    robot.claw.setPosition(robot.clawOpen);
+                    robot.liftTarget = 0;
+                }
             }
 
         } //ends "while opMode is active" loop
