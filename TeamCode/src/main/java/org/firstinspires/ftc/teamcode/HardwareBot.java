@@ -139,7 +139,7 @@ public class HardwareBot
         liftTarget = 500;
         lift.setTargetPosition(500);
         sleep(500);
-        if (laser.getDistance(DistanceUnit.INCH) > 2.5){
+        if (laser.getDistance(DistanceUnit.INCH) > 4){
             claw.setPosition(clawOpen);
             liftTarget = 0;
             lift.setTargetPosition(0);
@@ -149,14 +149,12 @@ public class HardwareBot
     }
 
     /**
-     * Lowers lift and uses the laser to look for the chamber (bar), then releases specimen
+     * Lowers lift to clip specimen
      */
     public void releaseSpecimen(){
-        timer.reset();
-        lift.setPower(.75);
+        lift.setPower(1);
         lift.setTargetPosition(0);
-        while (lift.getCurrentPosition()>1750 && timer.milliseconds()<200){
-        }
+        sleep(500);
         claw.setPosition(clawOpen);
     }
 
