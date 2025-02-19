@@ -202,7 +202,7 @@ public class MecOneDrive extends LinearOpMode
                     speedFactor = 1;
 
                     //tilt control
-                    if (currentGamepad1.y && !previousGamepad1.y){
+                    if (currentGamepad1.y && !previousGamepad1.y && robot.liftPosition < robot.maxHeight *.5 ){
                         if  (robot.tiltPosition < 100 || robot.tiltPosition > robot.floor*.9){
                             robot.tiltTarget = (int)(robot.floor*.75);
                         }
