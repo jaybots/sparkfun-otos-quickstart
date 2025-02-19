@@ -33,7 +33,7 @@ public class Clips extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(47,-8),-Math.PI/2,new TranslationalVelConstraint(20))
                 .splineToConstantHeading(new Vector2d(47, -42), -Math.PI / 2)
                 .setTangent(Math.PI/2)
-                .splineToConstantHeading(new Vector2d(38,-52),-Math.PI/2);
+                .splineToConstantHeading(new Vector2d(38,-51),-Math.PI/2);
 
         TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(35, -56,-Math.PI/2 ))
                 .setTangent(Math.PI/2)
@@ -41,11 +41,11 @@ public class Clips extends LinearOpMode {
 
         TrajectoryActionBuilder tab4 = drive.actionBuilder(new Pose2d(2, -27,Math.PI/2 ))
                 .setTangent(-Math.PI/2)
-                .splineToSplineHeading(new Pose2d(38,-52, -Math.PI/2),-Math.PI/2);
+                .splineToSplineHeading(new Pose2d(38,-51, -Math.PI/2),-Math.PI/2);
 
         TrajectoryActionBuilder tab5 = drive.actionBuilder(new Pose2d(2, -27,Math.PI/2 ))
                 .setTangent(-Math.PI/2)
-                .splineToSplineHeading(new Pose2d(38,-52, Math.PI/2),0);
+                .splineToSplineHeading(new Pose2d(38,-51, Math.PI/2),0);
 
 
         while (!isStopRequested() && !opModeIsActive()) {
@@ -75,19 +75,19 @@ public class Clips extends LinearOpMode {
             sleep(100);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
-            robot.releaseSpecimen();
+            //robot.releaseSpecimen();
             sleep(200);
             Actions.runBlocking(new SequentialAction(tab4.build()));
             sleep(100);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(2,0 ),0));
             sleep(1000);
             drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0. ),0));
-            robot.grabSpecimen();
+            //robot.grabSpecimen();
             robot.lift.setTargetPosition(2050);
             sleep(100);
             Actions.runBlocking(new SequentialAction(tab3.build()));
             sleep(500);
-            robot.releaseSpecimen();
+            //robot.releaseSpecimen();
             sleep(200);
             Actions.runBlocking(new SequentialAction(tab5.build()));
             done = true;
