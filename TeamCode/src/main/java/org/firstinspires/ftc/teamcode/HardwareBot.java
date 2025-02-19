@@ -138,12 +138,29 @@ public class HardwareBot
 
     public boolean grabSpecimen() {
         timer.reset();
+        double s = .4;
         double voltage = pixy.getVoltage();
-        if (voltage > 0.1 && voltage < 1.4){
-            left(1,.2);
+        if (voltage > 0.1 && voltage < 1.65){
+            while (voltage<1.6){
+                voltage = pixy.getVoltage();
+                s = Math.max(Math.abs(voltage - .1)/4.0,.2);
+                leftFront.setPower(-s);
+                rightFront.setPower(s);
+                leftBack.setPower(s);
+                rightBack.setPower(-s);
+            }
+            forwardTime(.2,300);
         }
-        if (voltage > 2.2){
-            right(1, .2);
+        if (voltage > 1.8){
+            while (voltage>1.8){
+                voltage = pixy.getVoltage();
+                s = Math.max(Math.abs(voltage - 1.8)/4.0,.2);
+                leftFront.setPower(s);
+                rightFront.setPower(-s);
+                leftBack.setPower(-s);
+                rightBack.setPower(s);
+            }
+            forwardTime(.2,300);
         }
         claw.setPosition(clawClosed);
         sleep(400);

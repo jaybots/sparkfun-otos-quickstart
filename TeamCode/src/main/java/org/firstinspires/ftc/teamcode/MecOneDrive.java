@@ -50,7 +50,7 @@ public class MecOneDrive extends LinearOpMode
         // The while loop below runs until Play is pressed
         // Current info is displayed
         while (!isStarted() && !isStopRequested()){
-            //robot.claw.setPosition(robot.clawOpen);
+            robot.claw.setPosition(robot.clawOpen);
             pos = robot.odo.getPosition();
             telemetry.addData("X coordinate", pos.x);
             telemetry.addData("Y coordinate", pos.y);
@@ -72,6 +72,11 @@ public class MecOneDrive extends LinearOpMode
 
         while (opModeIsActive()) {
 
+            telemetry.addData("pixy", robot.pixy.getVoltage());
+            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
+            telemetry.addData("lift amps", robot.lift.getCurrent(CurrentUnit.AMPS));
+            telemetry.update();
+
             robot.tilt.setTargetPosition(robot.tiltTarget);
             robot.lift.setTargetPosition(robot.liftTarget);
 
@@ -90,17 +95,20 @@ public class MecOneDrive extends LinearOpMode
             if (currentGamepad2.y) driveMode = Mode.YBAR;
 
             //player 2 lift override in case auto was stopped
-            if (currentGamepad2.right_stick_y < -0.3){
+            if (currentGamepad2.right_stick_y < -0.3 || currentGamepad1.right_stick_y < -0.3){
                 robot.liftTarget += 20;
             }
-            else if (currentGamepad2.right_stick_y  > 0.3 ){
-                robot.liftTarget -= 100;
+            else if (currentGamepad2.right_stick_y  > 0.3){
+                robot.liftTarget -= 40;
+            }
+            else if (currentGamepad1.right_stick_y  > 0.3 ) {
+                robot.liftTarget -= 20;
             }
 
             //SAFETY AND RULE REQUIRED OVERRIDES
 
             //reset lift encoder if amps are high and it's in down position
-            if (robot.liftPosition < 100 && currentGamepad2.right_stick_y > 0.3 && robot.lift.getCurrent(CurrentUnit.AMPS) > 7) {
+            if (robot.lift.getCurrent(CurrentUnit.AMPS) > 7) {
                 robot.lift.setPower(0);
                 robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.lift.setTargetPosition(0);
@@ -118,9 +126,10 @@ public class MecOneDrive extends LinearOpMode
             //PRIMARY CONTROLS THAT ARE ACTIVE IN ALL MODES
 
             //wheel control
-            drv  = -currentGamepad1.right_stick_y;
+            drv  = -currentGamepad1.left_stick_y;
             strafe = currentGamepad1.left_stick_x;
             twist  = currentGamepad1.right_stick_x;
+            if (Math.abs(twist)<.5) twist = 0;
 
             speeds[0] = (drv + strafe + twist) * speedFactor;
             speeds[1] = (drv - strafe - twist) * speedFactor;
@@ -141,6 +150,12 @@ public class MecOneDrive extends LinearOpMode
             robot.rightFront.setPower(speeds[1]);
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
+
+            if (currentGamepad1.right_bumper ){
+                robot.grabSpecimen();
+                //robot.flip();
+                robot.stopWheels();
+            }
 
             //Swivel the intake
             if (currentGamepad1.dpad_right &&  robot.twistPosition < 1){
@@ -234,8 +249,8 @@ public class MecOneDrive extends LinearOpMode
                 //CONTROLS FOR OUTTAKE AT BASKET
                 case XBASKET:
 
+                    robot.twist.setPosition(robot.twistZero);
                     speedFactor = 0.5;
-                    robot.liftTarget = robot.maxHeight;
                     //tilt back to vertical
                     if (currentGamepad1.b ){
                         robot.tiltTarget = 0;
@@ -247,18 +262,13 @@ public class MecOneDrive extends LinearOpMode
                 case YBAR:
 
                     speedFactor = 0.5;
-                    robot.liftTarget = barHeight;
+
                     if (currentGamepad1.left_bumper){
                         robot.releaseSpecimen();
                         robot.liftTarget = 0;
                     }
 
-                    if (currentGamepad1.right_bumper && robot.tiltPosition<200 && robot.liftPosition < 200 ){
-                        robot.grabSpecimen();
-                        robot.twistPosition = 1;
-                        robot.flip();
-                        robot.stopWheels();
-                    }
+
 
                     //tilt back to vertical
                     if (currentGamepad1.b ){
