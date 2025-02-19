@@ -39,8 +39,9 @@ public class Mec extends LinearOpMode
         // The while loop below runs until Play is pressed
         // Current info is displayed
         while (!isStarted() && !isStopRequested()){
-            //robot.claw.setPosition(robot.clawOpen);
+
             pos = robot.odo.getPosition();
+            telemetry.addData("pixy",robot.pixy.getVoltage());
             telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
             telemetry.addData("X coordinate", pos.x);
             telemetry.addData("Y coordinate", pos.y);
@@ -58,7 +59,7 @@ public class Mec extends LinearOpMode
         robot.lift.setPower(robot.liftPower);
 
         while (opModeIsActive()) {
-
+            telemetry.addData("pixy",robot.pixy.getVoltage());
             telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
             telemetry.update();
 
@@ -250,14 +251,11 @@ public class Mec extends LinearOpMode
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
 
-            if (gamepad2.right_bumper && robot.laser.getDistance(DistanceUnit.INCH) < 3 ){
+            if (gamepad2.right_bumper ){
                 if (robot.grabSpecimen()) {
-                    robot.flip();
-                    robot.liftTarget = barHeight;
-                }
-                else {
-                    robot.claw.setPosition(robot.clawOpen);
-                    robot.liftTarget = 0;
+                    //robot.flip();
+                    //robot.liftTarget = barHeight;
+                    robot.liftTarget = 600;
                 }
             }
 
