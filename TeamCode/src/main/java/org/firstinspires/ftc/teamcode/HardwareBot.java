@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode;
-
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -8,18 +7,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class HardwareBot
 {
-
     AnalogInput pixy = null;
     ElapsedTime timer = new ElapsedTime();
+    ElapsedTime sleeper = new ElapsedTime();
     public double flspeed = 0;
     public double frspeed = 0;
     public double blspeed = 0;
@@ -28,6 +25,7 @@ public class HardwareBot
     public DcMotor rightFront = null;
     public DcMotor leftBack = null;
     public DcMotor rightBack = null;
+    public DcMotor led = null;
     public DcMotorEx  lift = null;
     public DcMotor  tilt = null;
     public DcMotor  hang = null;
@@ -49,7 +47,6 @@ public class HardwareBot
     public int maxHeight = 3500;
     public double twistZero = 0.52;
     public double twistPosition = 0.52;
-
     HardwareMap hwMap  =  null;
     SparkFunOTOS.Pose2D pos;
 
@@ -81,6 +78,7 @@ public class HardwareBot
         leftBack = hwMap.get(DcMotor.class, "left_back");
         rightBack = hwMap.get(DcMotor.class, "right_back");
         lift = hwMap.get(DcMotorEx.class, "lift");
+        led = hwMap.get(DcMotor.class, "led");
         tilt = hwMap.get(DcMotor.class, "tilt");
         hang = hwMap.get(DcMotor.class, "hang");
         spin1 = hwMap.get(CRServo.class, "spin1");
@@ -111,6 +109,7 @@ public class HardwareBot
         spin1.setPower(0);
         spin2.setPower(0);
         claw.setPosition(clawClosed);
+        led.setPower(.5);
 
 
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -137,13 +136,14 @@ public class HardwareBot
     }
 
     public boolean grabSpecimen() {
+        led.setPower(.5);
         timer.reset();
         double s = .4;
         double voltage = pixy.getVoltage();
-        if (voltage > 0.1 && voltage < 1.65){
-            while (voltage<1.6){
+        if (voltage > 0.1 && voltage < 1.4){
+            while (voltage<1.3){
                 voltage = pixy.getVoltage();
-                s = Math.max(Math.abs(voltage - .1)/4.0,.2);
+                s = Math.max(Math.abs(1.5 - voltage) / 3.0, 0.2);
                 leftFront.setPower(-s);
                 rightFront.setPower(s);
                 leftBack.setPower(s);
@@ -151,10 +151,10 @@ public class HardwareBot
             }
             forwardTime(.2,300);
         }
-        if (voltage > 1.8){
-            while (voltage>1.8){
+        if (voltage > 1.6){
+            while (voltage>1.7){
                 voltage = pixy.getVoltage();
-                s = Math.max(Math.abs(voltage - 1.8)/4.0,.2);
+                s = Math.max(Math.abs(voltage - 1.5) / 3.0, 0.2);
                 leftFront.setPower(s);
                 rightFront.setPower(-s);
                 leftBack.setPower(-s);
@@ -171,12 +171,13 @@ public class HardwareBot
             claw.setPosition(clawOpen);
             liftTarget = 0;
             lift.setTargetPosition(0);
+            led.setPower(0);
             return false;
         }
+        led.setPower(0);
         return true;
 
     }
-
 
         /**
          * Lowers lift to clip specimen
@@ -261,79 +262,12 @@ public class HardwareBot
             sleep(time);
             stopWheels();
         }
-
-        /**
-         * Drives forward using optical odometer
-         * @param dist in inches
-         * @param speed as double
-         */
-        public void forward ( double dist, double speed){
-            resetOdo();
-            pos = odo.getPosition();
-            //p is proportional term for adjusting course
-            //px is drift left/right
-            //ph is drift in heading (yaw)
-            int px = 10;
-            int ph = 20;
-            flspeed = speed;
-            frspeed = speed;
-            blspeed = speed;
-            brspeed = speed;
-            double target = dist + pos.y;
-            while (pos.y < target) {
-                flspeed = speed - pos.x / px + pos.h / ph;
-                brspeed = speed - pos.x / px - pos.h / ph;
-                frspeed = speed + pos.x / px - pos.h / ph;
-                blspeed = speed + pos.x / px + pos.h / ph;
-                pos = odo.getPosition();
-                leftFront.setPower(flspeed);
-                rightFront.setPower(frspeed);
-                leftBack.setPower(blspeed);
-                rightBack.setPower(brspeed);
-            }
-            stopWheels();
-        }
-
-        /**
-         * Drives right using optical odometer
-         * @param dist in inches
-         * @param speed as double
-         */
-        public void right ( double dist, double speed){
-            resetOdo();
-            pos = odo.getPosition();
-            //p is proportional term for adjusting course
-            //px is drift forward/back
-            //ph is drift in heading (yaw)
-            int py = 50;
-            int ph = 50;
-            flspeed = speed;
-            frspeed = -speed;
-            blspeed = -speed;
-            brspeed = speed;
-            double target = dist + pos.x;
-            while (pos.x < target) {
-                //adjustments made to each wheel to keep bot on course
-                flspeed = speed - pos.y / py + pos.h / ph;
-                brspeed = speed - pos.y / py - pos.h / ph;
-                frspeed = -speed - pos.y / py - pos.h / ph;
-                blspeed = -speed - pos.y / py + pos.h / ph;
-                pos = odo.getPosition();
-                leftFront.setPower(flspeed);
-                rightFront.setPower(frspeed);
-                leftBack.setPower(blspeed);
-                rightBack.setPower(brspeed);
-            }
-            stopWheels();
-        }
-
         /**
          * Drives right a set amount of time, then stops wheels
          * @param time in milliseconds
          * @param speed as double
          */
         public void rightTime ( int time, double speed){
-            resetOdo();
             pos = odo.getPosition();
             //p is proportional term for adjusting course
             //px is drift forward/back
@@ -359,39 +293,6 @@ public class HardwareBot
             sleep(time);
             stopWheels();
         }
-
-        /**
-         * Drives left using optical odometer, then stops wheels
-         * @param dist in inches
-         * @param speed as double
-         */
-        public void left ( double dist, double speed){
-            resetOdo();
-            pos = odo.getPosition();
-            //p is proportional term for adjusting course
-            //px is drift forward/back
-            //ph is drift in heading (yaw)
-            int py = 50;
-            int ph = 50;
-            flspeed = -speed;
-            frspeed = speed;
-            blspeed = speed;
-            brspeed = -speed;
-            double target = pos.x - dist;
-            while (pos.x > target) {
-                //adjustments made to each wheel to keep bot on course
-                flspeed = -speed - pos.y / py + pos.h / ph;
-                brspeed = -speed - pos.y / py - pos.h / ph;
-                frspeed = speed - pos.y / py - pos.h / ph;
-                blspeed = speed - pos.y / py + pos.h / ph;
-                pos = odo.getPosition();
-                leftFront.setPower(flspeed);
-                rightFront.setPower(frspeed);
-                leftBack.setPower(blspeed);
-                rightBack.setPower(brspeed);
-            }
-            stopWheels();
-        }
         /**
          * Drives left a set amount of time, then stops wheels
          * @param time in milliseconds
@@ -410,172 +311,14 @@ public class HardwareBot
             sleep(time);
             stopWheels();
         }
-
-        /**
-         * Drives back a set number of inches using optical odometer, then stops wheels
-         * @param speed as double
-         * @param dist in inches
-         */
-        public void back ( double dist, double speed){
-            resetOdo();
-            pos = odo.getPosition();
-            //p is proportional term for adjusting course
-            //px is drift left/right
-            //ph is drift in heading (yaw)
-            int px = 10;
-            int ph = 20;
-            flspeed = -speed;
-            frspeed = -speed;
-            blspeed = -speed;
-            brspeed = -speed;
-            double target = pos.y - dist;
-            while (pos.y > target) {
-                flspeed = -speed - pos.x / px + pos.h / ph;
-                brspeed = -speed - pos.x / px - pos.h / ph;
-                frspeed = -speed + pos.x / px - pos.h / ph;
-                blspeed = -speed + pos.x / px + pos.h / ph;
-                pos = odo.getPosition();
-                leftFront.setPower(flspeed);
-                rightFront.setPower(frspeed);
-                leftBack.setPower(blspeed);
-                rightBack.setPower(brspeed);
-            }
-            stopWheels();
-        }
-
-        /**
-         * Turns clockwise a set number of degrees then stops wheels
-         * @param turn degrees
-         */
-        public void cw ( int turn){
-            resetOdo();
-            double speed = 0.2;
-            double headingChange = 0;
-            pos = odo.getPosition();
-            double startHeading = pos.h;
-            double currentHeading = pos.h;
-            while (headingChange < turn) {
-                if (headingChange > turn - 30) {
-                    speed = 0.1;
-                }
-                leftFront.setPower(1 * speed);
-                rightBack.setPower(-1 * speed);
-                leftBack.setPower(1 * speed);
-                rightFront.setPower(-1 * speed);
-                pos = odo.getPosition();
-                currentHeading = pos.h;
-                if (Math.signum(startHeading) < Math.signum(currentHeading))
-                    headingChange = 360 + startHeading - currentHeading;
-                else
-                    headingChange = startHeading - currentHeading;
-            }
-            stopWheels();
-        }
-
-        /**
-         * Turns counterclockwise 180 degrees quickly then stops wheels
-         */
-        public void flip () {
-            resetOdo();
-            double speed = 1;
-            double currentHeading = 0;
-            while (currentHeading < 179) {
-                pos = odo.getPosition();
-                if (currentHeading > 90) {
-                    speed = 0.2;
-                }
-                leftFront.setPower(-1 * speed);
-                rightBack.setPower(1 * speed);
-                leftBack.setPower(-1 * speed);
-                rightFront.setPower(1 * speed);
-                pos = odo.getPosition();
-                currentHeading = Math.abs(pos.h);
-            }
-            stopWheels();
-        }
-
-        /**
-         * Turns right 90 degrees then stops wheels
-         */
-        public void right90 () {
-            resetOdo();
-            double speed = 1;
-            double currentHeading = 0;
-            while (currentHeading < 89) {
-                pos = odo.getPosition();
-                if (currentHeading > 15) {
-                    speed = 0.2;
-                }
-                leftFront.setPower(1 * speed);
-                rightBack.setPower(-1 * speed);
-                leftBack.setPower(1 * speed);
-                rightFront.setPower(-1 * speed);
-                pos = odo.getPosition();
-                currentHeading = Math.abs(pos.h);
-            }
-            stopWheels();
-        }
-        /**
-         * Turns left 90 degrees then stops wheels
-         */
-        public void left90 () {
-            resetOdo();
-            double speed = 1;
-            double currentHeading = 0;
-            while (currentHeading < 89) {
-                pos = odo.getPosition();
-                if (currentHeading > 15) {
-                    speed = 0.2;
-                }
-                leftFront.setPower(-1 * speed);
-                rightBack.setPower(1 * speed);
-                leftBack.setPower(-1 * speed);
-                rightFront.setPower(1 * speed);
-                pos = odo.getPosition();
-                currentHeading = Math.abs(pos.h);
-            }
-            stopWheels();
-        }
-
-
-        /**
-         * Turns counterclockwise a set number of degrees then stops wheels
-         * @param turn degrees
-         */
-        public void ccw ( int turn){
-            resetOdo();
-            double speed = 0.2;
-            double headingChange = 0;
-            pos = odo.getPosition();
-            double startHeading = pos.h;
-            double currentHeading = startHeading;
-            while (headingChange < turn) {
-                if (headingChange > turn - 30) {
-                    speed = 0.1;
-                }
-                leftFront.setPower(-1 * speed);
-                rightBack.setPower(1 * speed);
-                leftBack.setPower(-1 * speed);
-                rightFront.setPower(1 * speed);
-                pos = odo.getPosition();
-                currentHeading = pos.h;
-                if (Math.signum(startHeading) > Math.signum(currentHeading))
-                    headingChange = 360 - startHeading + currentHeading;
-                else
-                    headingChange = currentHeading - startHeading;
-
-            }
-            stopWheels();
-        }
-
-        /**
+       /**
          * Just waits a set amount of time
          * All running motors will still be running
          * @param x time in milliseconds
          */
         public void sleep ( int x){
-            ElapsedTime s = new ElapsedTime();
-            while (s.milliseconds() < x) {
+            sleeper.reset();
+            while (sleeper.milliseconds() < x) {
             }
         }
 

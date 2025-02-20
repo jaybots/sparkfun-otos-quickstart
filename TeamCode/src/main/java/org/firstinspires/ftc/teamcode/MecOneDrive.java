@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -18,6 +22,10 @@ import java.lang.Math;
 @TeleOp(name="MecOneDrive")
 public class MecOneDrive extends LinearOpMode
 {
+
+
+    ElapsedTime ampTimer = new ElapsedTime();
+    double amps = 0;
     HardwareBot robot = new HardwareBot();
     double speedFactor = 1;
     double drv = 0;
@@ -34,10 +42,11 @@ public class MecOneDrive extends LinearOpMode
     public void runOpMode() {
 
         robot.init(hardwareMap);
-        SparkFunOTOS.Pose2D pos;
-        Pose2d initialPose = new Pose2d(7, -61, Math.toRadians(90));
-        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
+        SparkFunOTOS.Pose2D pos;
+        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(0,0,0));
+        TrajectoryActionBuilder flip180 = drive.actionBuilder(new Pose2d(0,0,0))
+                .turn(Math.toRadians(180));
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
 
@@ -71,10 +80,15 @@ public class MecOneDrive extends LinearOpMode
         double[] speeds = {0, 0, 0, 0};
 
         while (opModeIsActive()) {
-
+            amps = robot.lift.getCurrent(CurrentUnit.AMPS);
+            pos = robot.odo.getPosition();
+            telemetry.addData("lift amps", amps);
             telemetry.addData("pixy", robot.pixy.getVoltage());
             telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
-            telemetry.addData("lift amps", robot.lift.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("lift amps", amps);
+            telemetry.addData("X coordinate", pos.x);
+            telemetry.addData("Y coordinate", pos.y);
+            telemetry.addData("Heading angle", pos.h);
             telemetry.update();
 
             robot.tilt.setTargetPosition(robot.tiltTarget);
@@ -108,7 +122,7 @@ public class MecOneDrive extends LinearOpMode
             //SAFETY AND RULE REQUIRED OVERRIDES
 
             //reset lift encoder if amps are high and it's in down position
-            if (robot.lift.getCurrent(CurrentUnit.AMPS) > 7) {
+            if (amps > 7) {
                 robot.lift.setPower(0);
                 robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.lift.setTargetPosition(0);
@@ -116,6 +130,18 @@ public class MecOneDrive extends LinearOpMode
                 robot.liftPosition = 0;
                 robot.liftTarget = 10;
                 robot.lift.setPower(robot.liftPower);
+                ampTimer.reset();
+            }
+
+            if (amps > 4 && ampTimer.milliseconds() > 3000) {
+                robot.lift.setPower(0);
+                robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.lift.setTargetPosition(0);
+                robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.liftPosition = 0;
+                robot.liftTarget = 10;
+                robot.lift.setPower(robot.liftPower);
+                ampTimer.reset();
             }
 
             if (robot.tiltPosition > robot.floor/2){
@@ -152,9 +178,9 @@ public class MecOneDrive extends LinearOpMode
             robot.rightBack.setPower(speeds[3]);
 
             if (currentGamepad1.right_bumper ){
-                robot.grabSpecimen();
-                //robot.flip();
-                robot.stopWheels();
+                if(robot.grabSpecimen()) {
+                    Actions.runBlocking(new SequentialAction(flip180.build()));
+                }
             }
 
             //Swivel the intake
@@ -216,19 +242,19 @@ public class MecOneDrive extends LinearOpMode
                     //fastest driving speeds
                     speedFactor = 1;
 
-                    //tilt control
-                    if (currentGamepad1.y && !previousGamepad1.y && robot.liftPosition < robot.maxHeight *.5 ){
-                        if  (robot.tiltPosition < 100 || robot.tiltPosition > robot.floor*.9){
-                            robot.tiltTarget = (int)(robot.floor*.75);
-                        }
-                        else {
-                            robot.tiltTarget = robot.floor - 50;
-                        }
-                    }
-                    //tilt back to vertical
-                    if (currentGamepad1.b ){
-                        robot.tiltTarget = 0;
-                    }
+//                    //tilt control
+//                    if (currentGamepad1.y && !previousGamepad1.y && robot.liftPosition < robot.maxHeight *.5 ){
+//                        if  (robot.tiltPosition < 100 || robot.tiltPosition > robot.floor*.9){
+//                            robot.tiltTarget = (int)(robot.floor*.75);
+//                        }
+//                        else {
+//                            robot.tiltTarget = robot.floor - 50;
+//                        }
+//                    }
+//                    //tilt back to vertical
+//                    if (currentGamepad1.b ){
+//                        robot.tiltTarget = 0;
+//                    }
 
 
                     break;

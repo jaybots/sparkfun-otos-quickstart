@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -10,8 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import java.lang.Math;
 
-
-@TeleOp(name="Mec")
+@Disabled
+//@TeleOp(name="Mec")
 public class Mec extends LinearOpMode
 {
     HardwareBot robot = new HardwareBot();
