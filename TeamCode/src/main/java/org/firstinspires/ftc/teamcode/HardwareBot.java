@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
@@ -15,6 +17,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class HardwareBot
 {
     AnalogInput pixy = null;
+    double voltage = 0;
+    double pixyCenter = 1.55;
+    double pixyRange = 0.1;
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime sleeper = new ElapsedTime();
     public double flspeed = 0;
@@ -134,16 +139,25 @@ public class HardwareBot
 
 
     }
+    public void blink(int n) {
+        for (int i = 0; i < n; i++){
+            led.setPower(0);
+            sleep(500);
+            led.setPower(.5);
+            sleep(500);
+        }
+    }
 
     public boolean grabSpecimen() {
-        led.setPower(.5);
         timer.reset();
-        double s = .4;
-        double voltage = pixy.getVoltage();
-        if (voltage > 0.1 && voltage < 1.4){
-            while (voltage<1.3){
-                voltage = pixy.getVoltage();
-                s = Math.max(Math.abs(1.5 - voltage) / 3.0, 0.2);
+        pixy.getVoltage();
+        sleep(100);
+        if (pixy.getVoltage() < 0.1) {
+            return false;
+        }
+        if (pixy.getVoltage() > 0.1 && pixy.getVoltage() < pixyCenter - pixyRange){
+            while (pixy.getVoltage() < pixyCenter - pixyRange - 0.3 && timer.milliseconds()<2000){
+                double s = Math.max(Math.abs(pixyCenter - voltage) / 5.0, 0.15);
                 leftFront.setPower(-s);
                 rightFront.setPower(s);
                 leftBack.setPower(s);
@@ -151,10 +165,9 @@ public class HardwareBot
             }
             forwardTime(.2,300);
         }
-        if (voltage > 1.6){
-            while (voltage>1.7){
-                voltage = pixy.getVoltage();
-                s = Math.max(Math.abs(voltage - 1.5) / 3.0, 0.2);
+        else if (pixy.getVoltage() > pixyCenter + pixyRange){
+            while (pixy.getVoltage() > pixyCenter + pixyRange +0.2  && timer.milliseconds()<2000){
+                double s = Math.max(Math.abs(voltage - pixyCenter) / 5.0, 0.15);
                 leftFront.setPower(s);
                 rightFront.setPower(-s);
                 leftBack.setPower(-s);
@@ -162,19 +175,18 @@ public class HardwareBot
             }
             forwardTime(.2,300);
         }
+        else if (pixy.getVoltage() < 0.1) return false;
         claw.setPosition(clawClosed);
         sleep(400);
         liftTarget = 500;
         lift.setTargetPosition(500);
         sleep(500);
-        if (laser.getDistance(DistanceUnit.INCH) > 4) {
+        if (laser.getDistance(DistanceUnit.INCH) > 5){
             claw.setPosition(clawOpen);
             liftTarget = 0;
             lift.setTargetPosition(0);
-            led.setPower(0);
             return false;
         }
-        led.setPower(0);
         return true;
 
     }
@@ -185,7 +197,7 @@ public class HardwareBot
         public void releaseSpecimen () {
             lift.setPower(1);
             lift.setTargetPosition(0);
-            sleep(500);
+            sleep(300);
             claw.setPosition(clawOpen);
         }
 
@@ -267,29 +279,11 @@ public class HardwareBot
          * @param time in milliseconds
          * @param speed as double
          */
-        public void rightTime ( int time, double speed){
-            pos = odo.getPosition();
-            //p is proportional term for adjusting course
-            //px is drift forward/back
-            //ph is drift in heading (yaw)
-            int py = 50;
-            int ph = 50;
-
-            flspeed = speed - pos.y / py + pos.h / ph;
-            brspeed = speed - pos.y / py - pos.h / ph;
-            frspeed = -speed - pos.y / py - pos.h / ph;
-            blspeed = -speed - pos.y / py + pos.h / ph;
-            pos = odo.getPosition();
-            leftFront.setPower(flspeed);
-            rightFront.setPower(frspeed);
-            leftBack.setPower(blspeed);
-            rightBack.setPower(brspeed);
-
-
-            leftFront.setPower(flspeed);
-            rightFront.setPower(frspeed);
-            leftBack.setPower(blspeed);
-            rightBack.setPower(brspeed);
+        public void rightTime ( double speed, int time){
+            leftFront.setPower(speed);
+            rightFront.setPower(-speed);
+            leftBack.setPower(-speed);
+            rightBack.setPower(speed);
             sleep(time);
             stopWheels();
         }
@@ -298,16 +292,11 @@ public class HardwareBot
          * @param time in milliseconds
          * @param speed as double
          */
-        public void leftTime ( int time, double speed){
-
-            flspeed = -speed;
-            frspeed = speed;
-            blspeed = speed;
-            brspeed = -speed;
-            leftFront.setPower(flspeed);
-            rightFront.setPower(frspeed);
-            leftBack.setPower(blspeed);
-            rightBack.setPower(brspeed);
+        public void leftTime (double speed, int time){
+            leftFront.setPower(-speed);
+            rightFront.setPower(speed);
+            leftBack.setPower(speed);
+            rightBack.setPower(-speed);
             sleep(time);
             stopWheels();
         }
@@ -329,7 +318,6 @@ public class HardwareBot
             odo.setPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
             sleep(50);
         }
-
 
 
 }

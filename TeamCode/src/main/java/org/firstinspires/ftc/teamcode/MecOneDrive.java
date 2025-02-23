@@ -179,7 +179,11 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.right_bumper ){
                 if(robot.grabSpecimen()) {
+                    robot.backTime(.5,300);
                     Actions.runBlocking(new SequentialAction(flip180.build()));
+                }
+                else {
+                    robot.claw.setPosition(robot.clawOpen);
                 }
             }
 

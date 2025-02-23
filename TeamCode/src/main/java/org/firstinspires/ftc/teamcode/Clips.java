@@ -11,30 +11,34 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import java.lang.Math;
 
 
 @Autonomous(name = "Clips", group = "Right Side (Clip Red/Blue blocks)")
 public class Clips extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
-    Pose2d initialPose = new Pose2d(7, -61, Math.toRadians(90));
-    SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
+
     ElapsedTime match = new ElapsedTime();
 
     public void runOpMode() {
         robot.init(hardwareMap);
+        Pose2d initialPose = new Pose2d(7, -61, Math.toRadians(90));
+        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder start = drive.actionBuilder(initialPose)
-                .lineToY(-31);
+                .lineToY(-29);
 
-        TrajectoryActionBuilder pushBlock = drive.actionBuilder(new Pose2d(7, -31, Math.PI / 2))
+        TrajectoryActionBuilder pushBlock = drive.actionBuilder(new Pose2d(7, -29, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(33, -34, -Math.PI / 2), Math.PI / 2)
-                .splineToConstantHeading(new Vector2d(33, -21), Math.PI / 2, new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(46, -8), -Math.PI / 2, new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(46, -42), -Math.PI / 2)
-                .setTangent(Math.PI / 2)
-                .splineToConstantHeading(new Vector2d(38, -52), -Math.PI / 2);
+                .splineToSplineHeading(new Pose2d(34, -34, -Math.PI / 2), Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(34, -21), Math.PI / 2, new TranslationalVelConstraint(20))
+                .splineToConstantHeading(new Vector2d(43, -8), -Math.PI / 2, new TranslationalVelConstraint(20))
+                .splineToConstantHeading(new Vector2d(43, -46), -Math.PI / 2)
+                .strafeTo(new Vector2d(36,-46));
+                //.setTangent(Math.PI / 2)
+                //.splineToConstantHeading(new Vector2d(38, -52), -Math.PI / 2);
 
         TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(35, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
@@ -48,80 +52,73 @@ public class Clips extends LinearOpMode {
                 .setTangent(-Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(38, -52, Math.PI / 2), 0);
 
+        TrajectoryActionBuilder right10 = drive.actionBuilder(new Pose2d(46,-42 , -Math.PI / 2))
+                .strafeTo(new Vector2d(36,-44));
+
+
+
 
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
+            if (robot.laser.getDistance(DistanceUnit.INCH)>5){
+                telemetry.addData("problem","with laser");
+            }
+            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
             telemetry.addData("ready to", "start");
+            telemetry.update();
         }
         boolean done = false;
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
-            robot.lift.setTargetPosition(2150);
-            robot.tilt.setTargetPosition(380);
+            robot.lift.setTargetPosition(2140);
+            robot.tilt.setTargetPosition(100);
             sleep(200);
             Actions.runBlocking(new SequentialAction(start.build()));
             sleep(300);
             robot.releaseSpecimen();
-            robot.tilt.setTargetPosition(150);
+            robot.tilt.setTargetPosition(50);
             Actions.runBlocking(new SequentialAction(pushBlock.build()));
-            sleep(100);
-            roll(1000);
-            //allow two tries to get specimen
-            while (!robot.grabSpecimen()) {
-                rollBack(500);
-                sleep(1500);
-                roll(650);
-                if (match.milliseconds()>25000){
-                    rollBack(500);
-                    sleep(5000);
-                }
+            robot.forwardTime(.3,1200);
+            boolean goodGrab = robot.grabSpecimen();
+            while (!goodGrab) {
+                robot.backTime(.2,1000);
+                sleep(1000);
+                robot.forwardTime(.2,1200);
+                goodGrab = robot.grabSpecimen();
             }
             robot.lift.setTargetPosition(2050);
             sleep(100);
+            robot.tilt.setTargetPosition(200);
             Actions.runBlocking(new SequentialAction(wall2Bar.build()));
             sleep(500);
             robot.releaseSpecimen();
             sleep(200);
+            robot.tilt.setTargetPosition(0);
             Actions.runBlocking(new SequentialAction(bar2Wall.build()));
             sleep(100);
-            roll(1000);
+            robot.forwardTime(.2,1000);
             while (!robot.grabSpecimen()) {
-                rollBack(500);
+                robot.backTime(.2,500);
                 sleep(1500);
-                roll(650);
+                robot.forwardTime(.2,650);
                 if (match.milliseconds()>25000){
-                    rollBack(500);
+                    robot.backTime(.2,500);
                     sleep(5000);
                 }
             }
             robot.lift.setTargetPosition(2050);
+            robot.tilt.setTargetPosition(200);
             sleep(100);
             Actions.runBlocking(new SequentialAction(wall2Bar.build()));
             sleep(500);
             robot.releaseSpecimen();
+            robot.tilt.setTargetPosition(0);
             sleep(200);
             Actions.runBlocking(new SequentialAction(park.build()));
             done = true;
         } //while opModeIsActive
     }  //ends runOpMode
-
-    /**
-     /rolls forward
-     /@param t as int time in milliseconds
-     */
-    public void roll ( int t){
-        drive.setDrivePowers(new PoseVelocity2d(new Vector2d(2, 0), 0));
-        sleep(t);
-        drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0.), 0));
-    }
-
-    public void rollBack ( int t){
-        drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-2, 0), 0));
-        sleep(t);
-        drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0.), 0));
-    }
-
-}  //ends Clips3 class
+}  //ends Clips class
 
