@@ -63,9 +63,10 @@ public class Clips extends LinearOpMode {
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
+            boolean abort = false;
             if (isStopRequested()) return;
             robot.lift.setTargetPosition(2140);
-            robot.tilt.setTargetPosition(100);
+            robot.tilt.setTargetPosition(150);
             sleep(200);
             Actions.runBlocking(new SequentialAction(start.build()));
             sleep(300);
@@ -96,19 +97,21 @@ public class Clips extends LinearOpMode {
                 sleep(1500);
                 robot.forwardTime(.2,650);
                 if (match.milliseconds()>25000){
-                    robot.backTime(.2,500);
-                    sleep(5000);
+                    abort = true;
+                    break;
                 }
             }
-            robot.lift.setTargetPosition(2050);
-            robot.tilt.setTargetPosition(200);
-            sleep(100);
-            Actions.runBlocking(new SequentialAction(wall2Bar.build()));
-            sleep(500);
-            robot.releaseSpecimen();
-            robot.tilt.setTargetPosition(0);
-            sleep(200);
-            Actions.runBlocking(new SequentialAction(park.build()));
+            if (!abort) {
+                robot.lift.setTargetPosition(2050);
+                robot.tilt.setTargetPosition(200);
+                sleep(100);
+                Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                sleep(500);
+                robot.releaseSpecimen();
+                robot.tilt.setTargetPosition(0);
+                sleep(200);
+                Actions.runBlocking(new SequentialAction(park.build()));
+            }
             done = true;
         } //while opModeIsActive
     }  //ends runOpMode

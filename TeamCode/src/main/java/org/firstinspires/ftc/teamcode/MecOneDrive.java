@@ -19,7 +19,7 @@ public class MecOneDrive extends LinearOpMode
     ElapsedTime ampTimer = new ElapsedTime();
     double amps = 0;
     HardwareBot robot = new HardwareBot();
-    double speedFactor = 1;
+    double speedFactor = .7;
     double drv = 0;
     double strafe = 0;
     double twist = 0;
@@ -33,9 +33,10 @@ public class MecOneDrive extends LinearOpMode
         robot.init(hardwareMap);
 
         SparkFunOTOS.Pose2D pos;
-        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(0,0,0));
-        TrajectoryActionBuilder flip180 = drive.actionBuilder(new Pose2d(0,0,0))
-                .turn(Math.toRadians(180));
+        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(35,-56,-Math.PI/2));
+        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(35, -56, -Math.PI / 2))
+                .setTangent(Math.PI / 2)
+                .splineToSplineHeading(new Pose2d(2, -29, Math.PI / 2), Math.PI / 2);
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
 
@@ -88,12 +89,10 @@ public class MecOneDrive extends LinearOpMode
             if (currentGamepad2.y) driveMode = Mode.YBAR;
 
             //player 2 lift override in case auto was stopped
-            if (currentGamepad2.right_stick_y < -0.3 || currentGamepad1.right_stick_y < -0.3){
+            if ( currentGamepad1.right_stick_y < -0.3){
                 robot.liftTarget += 20;
             }
-            else if (currentGamepad2.right_stick_y  > 0.3){
-                robot.liftTarget -= 40;
-            }
+
             else if (currentGamepad1.right_stick_y  > 0.3 ) {
                 robot.liftTarget -= 20;
             }
@@ -135,7 +134,7 @@ public class MecOneDrive extends LinearOpMode
             strafe = currentGamepad1.left_stick_x;
             twist  = currentGamepad1.right_stick_x;
             //slow down if close to wall
-            if (robot.sonar.getVoltage() < .05) speedFactor = .5;
+            if (robot.sonar.getVoltage() < .05) speedFactor /= 2;
             //prevent rotation of robot when lift control up/down in use
             if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
 
@@ -161,8 +160,8 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.right_bumper ){
                 if(robot.grabSpecimen()) {
-                    robot.backTime(.5,300);
-                    Actions.runBlocking(new SequentialAction(flip180.build()));
+                    Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                    robot.liftTarget = barHeight;
                 }
                 else {
                     robot.claw.setPosition(robot.clawOpen);
@@ -181,7 +180,7 @@ public class MecOneDrive extends LinearOpMode
             //fast lift control
             if (currentGamepad1.x){
                 robot.liftTarget = barHeight;
-                if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
+                //if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
             }
 
             //hang control
@@ -226,13 +225,13 @@ public class MecOneDrive extends LinearOpMode
                 case ADRIVE:
 
                     //fastest driving speeds
-                    speedFactor = 1;
+                    speedFactor = .7;
                     break;
 
                 //CONTROLS FOR INTAKE FROM SUBMERSIBLE
                 case BSUB:
 
-                    speedFactor = 0.5;
+                    speedFactor = 0.4;
                     //toggle tilt positions quickly
                     if (currentGamepad1.y && !previousGamepad1.y){
                         if (robot.tiltPosition < robot.floor -100) robot.tiltTarget = (int)(robot.floor * .8);
@@ -246,7 +245,7 @@ public class MecOneDrive extends LinearOpMode
                 case XBASKET:
 
                     robot.twist.setPosition(robot.twistZero);
-                    speedFactor = 0.5;
+                    speedFactor = 0.4;
                     //tilt back to vertical
                     if (currentGamepad1.b ){
                         robot.tiltTarget = 0;
@@ -257,7 +256,7 @@ public class MecOneDrive extends LinearOpMode
                 //CONTROLS FOR BAR / SPECIMENS
                 case YBAR:
 
-                    speedFactor = 0.5;
+                    speedFactor = 0.4;
 
                     if (currentGamepad1.left_bumper){
                         robot.releaseSpecimen();

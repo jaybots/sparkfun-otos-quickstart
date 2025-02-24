@@ -14,7 +14,7 @@ public class HardwareBot
     AnalogInput pixy = null;
     AnalogInput sonar = null;
     double voltage = 0;
-    double pixyCenter = 1.80;
+    double pixyCenter = 1.75;
     double pixyRange = 0.1;
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime sleeper = new ElapsedTime();
@@ -101,7 +101,7 @@ public class HardwareBot
         spin1.setPower(0);
         spin2.setPower(0);
         claw.setPosition(clawClosed);
-        led.setPower(.5);
+        led.setPower(0);
 
 
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -136,16 +136,19 @@ public class HardwareBot
     }
 
     public boolean grabSpecimen() {
+        led.setPower(0.5);
+        sleep(200);
         timer.reset();
         pixy.getVoltage();
         sleep(100);
+        double s = 0.25;
         //specimen not visible, return false, do nothing else
         if (pixy.getVoltage() < 0.1) {
+            led.setPower(0);
             return false;
         }
         if (pixy.getVoltage() > 0.1 && pixy.getVoltage() < pixyCenter - pixyRange){
-            while (pixy.getVoltage() < pixyCenter - pixyRange - 0.3 && timer.milliseconds()<2000){
-                double s = Math.max(Math.abs(pixyCenter - voltage) / 5.0, 0.15);
+            while (pixy.getVoltage() < pixyCenter - pixyRange - 0.4 && timer.milliseconds()<2000){
                 leftFront.setPower(s);
                 rightFront.setPower(-s);
                 leftBack.setPower(-s);
@@ -153,8 +156,7 @@ public class HardwareBot
             }
         }
         else {
-            while (pixy.getVoltage() > pixyCenter + pixyRange + 0.2  && timer.milliseconds()<2000){
-                double s = Math.max(Math.abs(voltage - pixyCenter) / 5.0, 0.15);
+            while (pixy.getVoltage() > pixyCenter + pixyRange + 0.3  && timer.milliseconds()<2000){
                 leftFront.setPower(-s);
                 rightFront.setPower(s);
                 leftBack.setPower(s);
@@ -168,12 +170,14 @@ public class HardwareBot
         liftTarget = 500;
         lift.setTargetPosition(500);
         sleep(500);
-        if (pixy.getVoltage() < .1){
-            claw.setPosition(clawOpen);
-            liftTarget = 0;
-            lift.setTargetPosition(0);
-            return false;
-        }
+//        if (pixy.getVoltage() < .1){
+//            claw.setPosition(clawOpen);
+//            liftTarget = 0;
+//            lift.setTargetPosition(0);
+//            led.setPower(0);
+//            return false;
+//        }
+        led.setPower(0);
         return true;
 
     }
