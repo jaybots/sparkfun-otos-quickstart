@@ -14,7 +14,7 @@ public class HardwareBot
     AnalogInput pixy = null;
     AnalogInput sonar = null;
     double voltage = 0;
-    double pixyCenter = 1.55;
+    double pixyCenter = 1.80;
     double pixyRange = 0.1;
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime sleeper = new ElapsedTime();
@@ -45,7 +45,7 @@ public class HardwareBot
     public int liftTarget = 0;
     public int tiltTarget = 0;
     public int floor = 2400;
-    public int maxHeight = 3500;
+    public int maxHeight = 3400;
     public double twistZero = 0.52;
     public double twistPosition = 0.52;
     HardwareMap hwMap  =  null;

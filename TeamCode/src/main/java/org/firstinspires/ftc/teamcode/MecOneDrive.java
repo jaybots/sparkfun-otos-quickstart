@@ -16,8 +16,6 @@ import java.lang.Math;
 @TeleOp(name="MecOneDrive")
 public class MecOneDrive extends LinearOpMode
 {
-
-
     ElapsedTime ampTimer = new ElapsedTime();
     double amps = 0;
     HardwareBot robot = new HardwareBot();
@@ -26,11 +24,8 @@ public class MecOneDrive extends LinearOpMode
     double strafe = 0;
     double twist = 0;
     int barHeight = 2150;
-    double liftControl = 0;
-    double twistControl = 0;
     boolean grab = false;
     boolean release = false;
-    ElapsedTime timer  = new ElapsedTime();
     enum Mode {ADRIVE, BSUB, XBASKET, YBAR}
     @Override
     public void runOpMode() {
@@ -72,7 +67,7 @@ public class MecOneDrive extends LinearOpMode
 
         while (opModeIsActive()) {
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
-            telemetry.addData("lift amps", amps);
+            telemetry.addData("pixy",robot.pixy.getVoltage());
             telemetry.update();
 
             robot.tilt.setTargetPosition(robot.tiltTarget);
@@ -105,7 +100,7 @@ public class MecOneDrive extends LinearOpMode
 
             //SAFETY AND RULE REQUIRED OVERRIDES
 
-            //reset lift encoder if amps are high and it's in down position
+            //reset lift encoder if amps are high
             if (amps > 7) {
                 robot.lift.setPower(0);
                 robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -137,10 +132,12 @@ public class MecOneDrive extends LinearOpMode
 
             //wheel control
             drv  = -currentGamepad1.left_stick_y;
-            if (robot.sonar.getVoltage() < .05) speedFactor = .5;
             strafe = currentGamepad1.left_stick_x;
             twist  = currentGamepad1.right_stick_x;
-            if (Math.abs(twist)<.5) twist = 0;
+            //slow down if close to wall
+            if (robot.sonar.getVoltage() < .05) speedFactor = .5;
+            //prevent rotation of robot when lift control up/down in use
+            if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
 
             speeds[0] = (drv + strafe + twist) * speedFactor;
             speeds[1] = (drv - strafe - twist) * speedFactor;
