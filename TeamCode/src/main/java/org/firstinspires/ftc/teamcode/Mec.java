@@ -3,16 +3,13 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import java.lang.Math;
 
 @Disabled
-//@TeleOp(name="Mec")
+
 public class Mec extends LinearOpMode
 {
     HardwareBot robot = new HardwareBot();
@@ -43,7 +40,6 @@ public class Mec extends LinearOpMode
 
             pos = robot.odo.getPosition();
             telemetry.addData("pixy",robot.pixy.getVoltage());
-            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
             telemetry.addData("X coordinate", pos.x);
             telemetry.addData("Y coordinate", pos.y);
             telemetry.addData("Heading angle", pos.h);
@@ -60,9 +56,6 @@ public class Mec extends LinearOpMode
         robot.lift.setPower(robot.liftPower);
 
         while (opModeIsActive()) {
-            telemetry.addData("pixy",robot.pixy.getVoltage());
-            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
-            telemetry.update();
 
             //reset lift encoder if amps are high and it's in down position
             if (robot.liftPosition < 100 && liftControl > -0.3 && robot.lift.getCurrent(CurrentUnit.AMPS) > 7) {
@@ -254,8 +247,7 @@ public class Mec extends LinearOpMode
 
             if (gamepad2.right_bumper ){
                 if (robot.grabSpecimen()) {
-                    //robot.flip();
-                    //robot.liftTarget = barHeight;
+                    robot.liftTarget = barHeight;
                     robot.liftTarget = 600;
                 }
             }

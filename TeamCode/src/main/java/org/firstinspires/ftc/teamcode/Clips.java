@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
@@ -10,9 +9,6 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 import java.lang.Math;
 
 
@@ -60,10 +56,6 @@ public class Clips extends LinearOpMode {
 
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
-            if (robot.laser.getDistance(DistanceUnit.INCH)>5){
-                telemetry.addData("problem","with laser");
-            }
-            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
             telemetry.addData("ready to", "start");
             telemetry.update();
         }

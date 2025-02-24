@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,6 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class HardwareBot
 {
     AnalogInput pixy = null;
+    AnalogInput sonar = null;
     double voltage = 0;
     double pixyCenter = 1.55;
     double pixyRange = 0.1;
@@ -38,7 +34,7 @@ public class HardwareBot
     public CRServo spin2 = null;
     public Servo claw = null;
     public ServoImplEx twist = null;
-    public DistanceSensor laser = null;
+
     public SparkFunOTOS odo;
     public double clawOpen = 0.2;
     public double clawClosed = 0.55;
@@ -64,20 +60,11 @@ public class HardwareBot
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
-        odo = hwMap.get(SparkFunOTOS.class, "sensor_otos");
-        odo.calibrateImu();
         sleep(100);
-        odo.setLinearUnit(DistanceUnit.INCH);
-        odo.setAngularUnit(AngleUnit.DEGREES);
-        odo.resetTracking();
-        sleep(100);
-        odo.setLinearScalar(1.0);
-        sleep(100);
-        odo.setAngularScalar(1.0);
 
         // Define and Initialize Hardware
         pixy = hwMap.get(AnalogInput.class, "pixy");
-        laser = hwMap.get(DistanceSensor.class, "laser");
+        sonar = hwMap.get(AnalogInput.class, "sonar");
         leftFront = hwMap.get(DcMotor.class, "left_front");
         rightFront = hwMap.get(DcMotor.class, "right_front");
         leftBack = hwMap.get(DcMotor.class, "left_back");
@@ -152,36 +139,36 @@ public class HardwareBot
         timer.reset();
         pixy.getVoltage();
         sleep(100);
+        //specimen not visible, return false, do nothing else
         if (pixy.getVoltage() < 0.1) {
             return false;
         }
         if (pixy.getVoltage() > 0.1 && pixy.getVoltage() < pixyCenter - pixyRange){
             while (pixy.getVoltage() < pixyCenter - pixyRange - 0.3 && timer.milliseconds()<2000){
                 double s = Math.max(Math.abs(pixyCenter - voltage) / 5.0, 0.15);
-                leftFront.setPower(-s);
-                rightFront.setPower(s);
-                leftBack.setPower(s);
-                rightBack.setPower(-s);
-            }
-            forwardTime(.2,300);
-        }
-        else if (pixy.getVoltage() > pixyCenter + pixyRange){
-            while (pixy.getVoltage() > pixyCenter + pixyRange +0.2  && timer.milliseconds()<2000){
-                double s = Math.max(Math.abs(voltage - pixyCenter) / 5.0, 0.15);
                 leftFront.setPower(s);
                 rightFront.setPower(-s);
                 leftBack.setPower(-s);
                 rightBack.setPower(s);
             }
-            forwardTime(.2,300);
         }
-        else if (pixy.getVoltage() < 0.1) return false;
+        else {
+            while (pixy.getVoltage() > pixyCenter + pixyRange + 0.2  && timer.milliseconds()<2000){
+                double s = Math.max(Math.abs(voltage - pixyCenter) / 5.0, 0.15);
+                leftFront.setPower(-s);
+                rightFront.setPower(s);
+                leftBack.setPower(s);
+                rightBack.setPower(-s);
+            }
+
+        }
+        forwardTime(.2,300);
         claw.setPosition(clawClosed);
         sleep(400);
         liftTarget = 500;
         lift.setTargetPosition(500);
         sleep(500);
-        if (laser.getDistance(DistanceUnit.INCH) > 5){
+        if (pixy.getVoltage() < .1){
             claw.setPosition(clawOpen);
             liftTarget = 0;
             lift.setTargetPosition(0);

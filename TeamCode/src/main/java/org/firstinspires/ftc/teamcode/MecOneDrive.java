@@ -1,17 +1,11 @@
 package org.firstinspires.ftc.teamcode;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -60,17 +54,14 @@ public class MecOneDrive extends LinearOpMode
         // Current info is displayed
         while (!isStarted() && !isStopRequested()){
             robot.claw.setPosition(robot.clawOpen);
-            pos = robot.odo.getPosition();
-            telemetry.addData("X coordinate", pos.x);
-            telemetry.addData("Y coordinate", pos.y);
-            telemetry.addData("Heading angle", pos.h);
             telemetry.addData("tilt pos", robot.tilt.getCurrentPosition());
             telemetry.addData("lift pos", robot.lift.getCurrentPosition());
             telemetry.addData("tilt target", robot.tiltTarget);
             telemetry.addData("lift target", robot.liftTarget);
             telemetry.addData("lift amps", robot.lift.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("pixy", robot.pixy.getVoltage());
-            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
+            telemetry.addData("sonar", robot.sonar.getVoltage());
+            telemetry.addData("time", getRuntime());
             telemetry.update();
             sleep(100);
         }
@@ -81,14 +72,7 @@ public class MecOneDrive extends LinearOpMode
 
         while (opModeIsActive()) {
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
-            pos = robot.odo.getPosition();
             telemetry.addData("lift amps", amps);
-            telemetry.addData("pixy", robot.pixy.getVoltage());
-            telemetry.addData("laser", robot.laser.getDistance(DistanceUnit.INCH));
-            telemetry.addData("lift amps", amps);
-            telemetry.addData("X coordinate", pos.x);
-            telemetry.addData("Y coordinate", pos.y);
-            telemetry.addData("Heading angle", pos.h);
             telemetry.update();
 
             robot.tilt.setTargetPosition(robot.tiltTarget);
@@ -104,7 +88,7 @@ public class MecOneDrive extends LinearOpMode
 
             //SECONDARY DRIVER CONTROLS
             if (currentGamepad2.a) driveMode = Mode.ADRIVE;
-            if (currentGamepad2.b) driveMode = Mode.BSUB;
+            if (currentGamepad2.b && getRuntime() > 15) driveMode = Mode.BSUB;
             if (currentGamepad2.x) driveMode = Mode.XBASKET;
             if (currentGamepad2.y) driveMode = Mode.YBAR;
 
@@ -153,6 +137,7 @@ public class MecOneDrive extends LinearOpMode
 
             //wheel control
             drv  = -currentGamepad1.left_stick_y;
+            if (robot.sonar.getVoltage() < .05) speedFactor = .5;
             strafe = currentGamepad1.left_stick_x;
             twist  = currentGamepad1.right_stick_x;
             if (Math.abs(twist)<.5) twist = 0;
@@ -204,7 +189,7 @@ public class MecOneDrive extends LinearOpMode
 
             //hang control
             if (currentGamepad1.back) robot.hang.setPower(-1);
-            else if(currentGamepad1.start) {
+            else if(currentGamepad1.start && getRuntime() > 60){
                 robot.hang.setPower(1);
                 robot.tiltTarget = 400;
             }
@@ -245,22 +230,6 @@ public class MecOneDrive extends LinearOpMode
 
                     //fastest driving speeds
                     speedFactor = 1;
-
-//                    //tilt control
-//                    if (currentGamepad1.y && !previousGamepad1.y && robot.liftPosition < robot.maxHeight *.5 ){
-//                        if  (robot.tiltPosition < 100 || robot.tiltPosition > robot.floor*.9){
-//                            robot.tiltTarget = (int)(robot.floor*.75);
-//                        }
-//                        else {
-//                            robot.tiltTarget = robot.floor - 50;
-//                        }
-//                    }
-//                    //tilt back to vertical
-//                    if (currentGamepad1.b ){
-//                        robot.tiltTarget = 0;
-//                    }
-
-
                     break;
 
                 //CONTROLS FOR INTAKE FROM SUBMERSIBLE
