@@ -43,12 +43,14 @@ public class MecOneDrive extends LinearOpMode
         Gamepad previousGamepad1 = new Gamepad();
         Gamepad previousGamepad2 = new Gamepad();
 
-        int maxExt = 1697;
+        int maxExt = 1690;
         Mode driveMode = Mode.ADRIVE;
 
         // The while loop below runs until Play is pressed
         // Current info is displayed
         while (!isStarted() && !isStopRequested()){
+            if (gamepad1.y) robot.led.setPower(0.5);
+            if (gamepad1.x) robot.led.setPower(0.0);
             robot.claw.setPosition(robot.clawOpen);
             telemetry.addData("tilt pos", robot.tilt.getCurrentPosition());
             telemetry.addData("lift pos", robot.lift.getCurrentPosition());
@@ -61,7 +63,6 @@ public class MecOneDrive extends LinearOpMode
             telemetry.update();
             sleep(100);
         }
-
         robot.tilt.setPower(robot.tiltPower);
         robot.lift.setPower(robot.liftPower);
         double[] speeds = {0, 0, 0, 0};
@@ -84,11 +85,11 @@ public class MecOneDrive extends LinearOpMode
 
             //SECONDARY DRIVER CONTROLS
             if (currentGamepad2.a) driveMode = Mode.ADRIVE;
-            if (currentGamepad2.b && getRuntime() > 15) driveMode = Mode.BSUB;
+            if (currentGamepad2.b ) driveMode = Mode.BSUB;
             if (currentGamepad2.x) driveMode = Mode.XBASKET;
             if (currentGamepad2.y) driveMode = Mode.YBAR;
 
-            //player 2 lift override in case auto was stopped
+
             if ( currentGamepad1.right_stick_y < -0.3){
                 robot.liftTarget += 20;
             }
@@ -121,10 +122,12 @@ public class MecOneDrive extends LinearOpMode
                 robot.lift.setPower(robot.liftPower);
                 ampTimer.reset();
             }
+            else if (amps <= 4){
+                ampTimer.reset();
+            }
 
             if (robot.tiltPosition > robot.floor/2){
                 robot.liftTarget = Math.min(robot.liftTarget,maxExt);
-                robot.claw.setPosition(robot.clawOpen);
             }
 
             //PRIMARY CONTROLS THAT ARE ACTIVE IN ALL MODES
@@ -180,7 +183,7 @@ public class MecOneDrive extends LinearOpMode
             //fast lift control
             if (currentGamepad1.x){
                 robot.liftTarget = barHeight;
-                //if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
+                if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
             }
 
             //hang control
@@ -263,13 +266,10 @@ public class MecOneDrive extends LinearOpMode
                         robot.liftTarget = 0;
                     }
 
-
-
                     //tilt back to vertical
                     if (currentGamepad1.b ){
                         robot.tiltTarget = 0;
                     }
-
 
                     break;
             }
@@ -287,9 +287,6 @@ public class MecOneDrive extends LinearOpMode
                 robot.spinIn();
             }
 
-
-
-
-        } //ends "while opMode is active" loop
+        } //brace ends "while opMode is active" loop
     }  //brace ends runOpMode method
 } //brace ends Mec.java class

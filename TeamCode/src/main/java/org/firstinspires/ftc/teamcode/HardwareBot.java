@@ -140,7 +140,6 @@ public class HardwareBot
         sleep(200);
         timer.reset();
         pixy.getVoltage();
-        sleep(100);
         double s = 0.25;
         //specimen not visible, return false, do nothing else
         if (pixy.getVoltage() < 0.1) {
@@ -170,13 +169,13 @@ public class HardwareBot
         liftTarget = 500;
         lift.setTargetPosition(500);
         sleep(500);
-//        if (pixy.getVoltage() < .1){
-//            claw.setPosition(clawOpen);
-//            liftTarget = 0;
-//            lift.setTargetPosition(0);
-//            led.setPower(0);
-//            return false;
-//        }
+        if (pixy.getVoltage() < .1){
+            claw.setPosition(clawOpen);
+            liftTarget = 0;
+            lift.setTargetPosition(0);
+            led.setPower(0);
+            return false;
+        }
         led.setPower(0);
         return true;
 
