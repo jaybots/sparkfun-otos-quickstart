@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -23,7 +21,9 @@ public class MecOneDrive extends LinearOpMode
     double drv = 0;
     double strafe = 0;
     double twist = 0;
-    int barHeight = 2150;
+    int barHeight = 1860;
+    int tiltVertical = 150;
+
     boolean grab = false;
     boolean release = false;
     enum Mode {ADRIVE, BSUB, XBASKET, YBAR}
@@ -68,9 +68,13 @@ public class MecOneDrive extends LinearOpMode
         double[] speeds = {0, 0, 0, 0};
 
         while (opModeIsActive()) {
-            amps = robot.lift.getCurrent(CurrentUnit.AMPS);
+
+            telemetry.addData("lift pos", robot.liftPosition);
+            telemetry.addData("tilt pos", robot.tiltPosition);
             telemetry.addData("pixy",robot.pixy.getVoltage());
             telemetry.update();
+            amps = robot.lift.getCurrent(CurrentUnit.AMPS);
+
 
             robot.tilt.setTargetPosition(robot.tiltTarget);
             robot.lift.setTargetPosition(robot.liftTarget);
@@ -134,10 +138,9 @@ public class MecOneDrive extends LinearOpMode
 
             //wheel control
             drv  = -currentGamepad1.left_stick_y;
-            strafe = currentGamepad1.left_stick_x;
-            twist  = currentGamepad1.right_stick_x;
-            //slow down if close to wall
-            if (robot.sonar.getVoltage() < .05) speedFactor /= 2;
+            strafe = currentGamepad1.left_stick_x*.75;
+            twist  = currentGamepad1.right_stick_x*.75;
+
             //prevent rotation of robot when lift control up/down in use
             if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
 
@@ -163,8 +166,9 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.right_bumper ){
                 if(robot.grabSpecimen()) {
-                    Actions.runBlocking(new SequentialAction(wall2Bar.build()));
-                    robot.liftTarget = barHeight;
+                    //Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                    //robot.liftTarget = barHeight;
+
                 }
                 else {
                     robot.claw.setPosition(robot.clawOpen);
@@ -182,7 +186,7 @@ public class MecOneDrive extends LinearOpMode
 
             //fast lift control
             if (currentGamepad1.x){
-                robot.liftTarget = barHeight;
+                if (robot.liftPosition < barHeight) robot.liftTarget = barHeight;
                 if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
             }
 
@@ -196,10 +200,10 @@ public class MecOneDrive extends LinearOpMode
 
             //rotate tilt using dpad - doesn't prevent tilt from going higher than it should
             if (currentGamepad1.dpad_down) {
-                robot.tiltTarget = Math.max(0, robot.tiltTarget - 15);
+                robot.tiltTarget = Math.max(0, robot.tiltTarget - 30);
             }
             else if (currentGamepad1.dpad_up){
-                robot.tiltTarget = Math.min(robot.tiltTarget + 15, robot.floor);
+                robot.tiltTarget = Math.min(robot.tiltTarget + 30, robot.floor);
             }
 
             //release is set to true if left trigger is squeezed
@@ -220,7 +224,10 @@ public class MecOneDrive extends LinearOpMode
                 robot.spinStop();
             }
 
-            if (currentGamepad1.a) robot.liftTarget = 0;
+            if (currentGamepad1.a) {
+                robot.liftTarget = 0;
+                robot.tiltTarget = tiltVertical;
+            }
             if (currentGamepad1.b) robot.tiltTarget = 0;
 
             switch  (driveMode){
@@ -228,6 +235,14 @@ public class MecOneDrive extends LinearOpMode
                 case ADRIVE:
 
                     //fastest driving speeds
+                    if (currentGamepad1.x) {
+                        robot.liftTarget = barHeight;
+                        robot.tiltTarget = 0;
+                    }
+                    if (currentGamepad1.a) {
+                        robot.tiltTarget = tiltVertical;
+                        robot.liftTarget = 0;
+                    }
                     speedFactor = .7;
                     break;
 
@@ -263,6 +278,7 @@ public class MecOneDrive extends LinearOpMode
 
                     if (currentGamepad1.left_bumper){
                         robot.releaseSpecimen();
+
                         robot.liftTarget = 0;
                     }
 

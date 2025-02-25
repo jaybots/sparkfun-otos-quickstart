@@ -14,7 +14,7 @@ public class HardwareBot
     AnalogInput pixy = null;
     AnalogInput sonar = null;
     double voltage = 0;
-    double pixyCenter = 1.75;
+    double pixyCenter = 1.85;
     double pixyRange = 0.1;
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime sleeper = new ElapsedTime();
@@ -37,7 +37,7 @@ public class HardwareBot
 
     public SparkFunOTOS odo;
     public double clawOpen = 0.2;
-    public double clawClosed = 0.55;
+    public double clawClosed = 0.58;
     public double liftPower = 1;
     public double tiltPower = 0.7;
     public int liftPosition = 0;
@@ -124,6 +124,8 @@ public class HardwareBot
         lift.setTargetPosition(0);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        twist.setPosition(twistZero);
+
 
     }
     public void blink(int n) {
@@ -137,6 +139,8 @@ public class HardwareBot
 
     public boolean grabSpecimen() {
         led.setPower(0.5);
+        tilt.setTargetPosition(150);
+        tiltTarget = 150;
         sleep(200);
         timer.reset();
         pixy.getVoltage();
@@ -186,9 +190,11 @@ public class HardwareBot
          */
         public void releaseSpecimen () {
             lift.setPower(1);
+            liftTarget = 0;
             lift.setTargetPosition(0);
             sleep(300);
             claw.setPosition(clawOpen);
+            backTime(.3,300);
         }
 
         /**
