@@ -124,7 +124,7 @@ public class HardwareBot
         lift.setTargetPosition(0);
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        twist.setPosition(twistZero);
+
 
 
     }
@@ -171,8 +171,10 @@ public class HardwareBot
         claw.setPosition(clawClosed);
         sleep(400);
         liftTarget = 500;
-        lift.setTargetPosition(500);
+        lift.setTargetPosition(liftTarget);
         sleep(500);
+        tiltTarget = 0;
+        tilt.setTargetPosition(tiltTarget);
         if (pixy.getVoltage() < .1){
             claw.setPosition(clawOpen);
             liftTarget = 0;
@@ -194,7 +196,8 @@ public class HardwareBot
             lift.setTargetPosition(0);
             sleep(300);
             claw.setPosition(clawOpen);
-            backTime(.3,300);
+            tiltTarget = 150;
+            tilt.setTargetPosition(150);
         }
 
         /**

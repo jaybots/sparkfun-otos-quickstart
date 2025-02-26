@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -15,6 +17,7 @@ import java.lang.Math;
 public class MecOneDrive extends LinearOpMode
 {
     ElapsedTime ampTimer = new ElapsedTime();
+    boolean ryanMode = false;
     double amps = 0;
     HardwareBot robot = new HardwareBot();
     double speedFactor = .7;
@@ -34,9 +37,14 @@ public class MecOneDrive extends LinearOpMode
 
         SparkFunOTOS.Pose2D pos;
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(35,-56,-Math.PI/2));
+
         TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(35, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(2, -29, Math.PI / 2), Math.PI / 2);
+        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -27, Math.PI / 2))
+                .setTangent(-Math.PI / 2)
+                .splineToSplineHeading(new Pose2d(38, -52, -Math.PI / 2), -Math.PI / 2);
+
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
 
@@ -49,8 +57,6 @@ public class MecOneDrive extends LinearOpMode
         // The while loop below runs until Play is pressed
         // Current info is displayed
         while (!isStarted() && !isStopRequested()){
-            if (gamepad1.y) robot.led.setPower(0.5);
-            if (gamepad1.x) robot.led.setPower(0.0);
             robot.claw.setPosition(robot.clawOpen);
             telemetry.addData("tilt pos", robot.tilt.getCurrentPosition());
             telemetry.addData("lift pos", robot.lift.getCurrentPosition());
@@ -72,6 +78,7 @@ public class MecOneDrive extends LinearOpMode
             telemetry.addData("lift pos", robot.liftPosition);
             telemetry.addData("tilt pos", robot.tiltPosition);
             telemetry.addData("pixy",robot.pixy.getVoltage());
+
             telemetry.update();
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
 
@@ -87,12 +94,23 @@ public class MecOneDrive extends LinearOpMode
             currentGamepad1.copy(gamepad1);
             currentGamepad2.copy(gamepad2);
 
+            if (ryanMode){
+                boolean temp;
+                temp = currentGamepad1.a;
+                currentGamepad1.a = currentGamepad1.b;
+                currentGamepad1.b = temp;
+                temp = currentGamepad1.x;
+                currentGamepad1.x = currentGamepad1.y;
+                currentGamepad1.y = temp;
+            }
+
             //SECONDARY DRIVER CONTROLS
             if (currentGamepad2.a) driveMode = Mode.ADRIVE;
             if (currentGamepad2.b ) driveMode = Mode.BSUB;
             if (currentGamepad2.x) driveMode = Mode.XBASKET;
             if (currentGamepad2.y) driveMode = Mode.YBAR;
-
+            if (currentGamepad2.right_bumper) ryanMode = true;
+            if (currentGamepad2.left_bumper) ryanMode = false;
 
             if ( currentGamepad1.right_stick_y < -0.3){
                 robot.liftTarget += 20;
@@ -166,28 +184,33 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.right_bumper ){
                 if(robot.grabSpecimen()) {
-                    //Actions.runBlocking(new SequentialAction(wall2Bar.build()));
-                    //robot.liftTarget = barHeight;
-
+                    Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                    robot.liftTarget = barHeight;
                 }
                 else {
                     robot.claw.setPosition(robot.clawOpen);
                 }
             }
 
+            if (currentGamepad1.left_bumper){
+                robot.releaseSpecimen();
+                Actions.runBlocking(new SequentialAction(bar2Wall.build()));
+            }
+
             //Swivel the intake
             if (currentGamepad1.dpad_right &&  robot.twistPosition < 1){
-                robot.twistPosition += 0.01;
+                robot.twistPosition += 0.02;
             }
 
             else if (currentGamepad1.dpad_left && robot.twistPosition > 0){
-                robot.twistPosition -= 0.01;
+                robot.twistPosition -= 0.02;
             }
 
             //fast lift control
             if (currentGamepad1.x){
+                robot.twist.setPosition(robot.twistZero);
                 if (robot.liftPosition < barHeight) robot.liftTarget = barHeight;
-                if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
+                else if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
             }
 
             //hang control
@@ -228,11 +251,13 @@ public class MecOneDrive extends LinearOpMode
                 robot.liftTarget = 0;
                 robot.tiltTarget = tiltVertical;
             }
-            if (currentGamepad1.b) robot.tiltTarget = 0;
+            if (currentGamepad1.b) robot.tiltTarget = tiltVertical;
 
             switch  (driveMode){
                 //CONTROLS FOR BASIC DRIVE MODE
                 case ADRIVE:
+
+
 
                     //fastest driving speeds
                     if (currentGamepad1.x) {
@@ -266,7 +291,7 @@ public class MecOneDrive extends LinearOpMode
                     speedFactor = 0.4;
                     //tilt back to vertical
                     if (currentGamepad1.b ){
-                        robot.tiltTarget = 0;
+                        robot.tiltTarget = tiltVertical;
                     }
 
                     break;
@@ -278,13 +303,13 @@ public class MecOneDrive extends LinearOpMode
 
                     if (currentGamepad1.left_bumper){
                         robot.releaseSpecimen();
-
                         robot.liftTarget = 0;
+                        robot.tiltTarget = tiltVertical;
                     }
 
                     //tilt back to vertical
                     if (currentGamepad1.b ){
-                        robot.tiltTarget = 0;
+                        robot.tiltTarget = tiltVertical;
                     }
 
                     break;

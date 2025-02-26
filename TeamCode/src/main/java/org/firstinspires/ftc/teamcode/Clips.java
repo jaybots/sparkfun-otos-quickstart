@@ -63,6 +63,7 @@ public class Clips extends LinearOpMode {
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
+            robot.twist.setPosition(robot.twistZero);
             boolean abort = false;
             if (isStopRequested()) return;
             robot.lift.setTargetPosition(2140);
@@ -71,7 +72,7 @@ public class Clips extends LinearOpMode {
             Actions.runBlocking(new SequentialAction(start.build()));
             sleep(300);
             robot.releaseSpecimen();
-            robot.tilt.setTargetPosition(200);
+            robot.tilt.setTargetPosition(150);
             Actions.runBlocking(new SequentialAction(pushBlock.build()));
             robot.forwardTime(.3,1200);
             boolean goodGrab = robot.grabSpecimen();
@@ -88,7 +89,7 @@ public class Clips extends LinearOpMode {
             sleep(500);
             robot.releaseSpecimen();
             sleep(200);
-            robot.tilt.setTargetPosition(0);
+            robot.tilt.setTargetPosition(150);
             Actions.runBlocking(new SequentialAction(bar2Wall.build()));
             sleep(100);
             robot.forwardTime(.2,1000);
