@@ -150,6 +150,7 @@ public class MecOneDrive extends LinearOpMode
 
             if (robot.tiltPosition > robot.floor/2){
                 robot.liftTarget = Math.min(robot.liftTarget,maxExt);
+                robot.claw.setPosition(robot.clawOpen);
             }
 
             //PRIMARY CONTROLS THAT ARE ACTIVE IN ALL MODES
@@ -198,11 +199,11 @@ public class MecOneDrive extends LinearOpMode
             }
 
             //Swivel the intake
-            if (currentGamepad1.dpad_right &&  robot.twistPosition < 1){
+            if (currentGamepad1.dpad_left &&  robot.twistPosition < 1){
                 robot.twistPosition += 0.02;
             }
 
-            else if (currentGamepad1.dpad_left && robot.twistPosition > 0){
+            else if (currentGamepad1.dpad_right && robot.twistPosition > 0){
                 robot.twistPosition -= 0.02;
             }
 
