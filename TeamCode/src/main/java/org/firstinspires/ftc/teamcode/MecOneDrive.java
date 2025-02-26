@@ -40,7 +40,7 @@ public class MecOneDrive extends LinearOpMode
 
         TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(35, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(2, -29, Math.PI / 2), Math.PI / 2);
+                .splineToSplineHeading(new Pose2d(14, -29, Math.PI / 2), Math.PI / 2);
         TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -27, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(38, -52, -Math.PI / 2), -Math.PI / 2);
@@ -72,6 +72,7 @@ public class MecOneDrive extends LinearOpMode
         robot.tilt.setPower(robot.tiltPower);
         robot.lift.setPower(robot.liftPower);
         double[] speeds = {0, 0, 0, 0};
+        robot.twist.setPosition(robot.twistZero);
 
         while (opModeIsActive()) {
 
@@ -96,12 +97,18 @@ public class MecOneDrive extends LinearOpMode
 
             if (ryanMode){
                 boolean temp;
+                temp = currentGamepad1.x;
+                currentGamepad1.x = currentGamepad1.a;
+                currentGamepad1.x = temp;
+                temp = currentGamepad1.y;
+                currentGamepad1.y = currentGamepad1.x;
+                currentGamepad1.x = temp;
+                temp = currentGamepad1.b;
+                currentGamepad1.b = currentGamepad1.y;
+                currentGamepad1.y = temp;
                 temp = currentGamepad1.a;
                 currentGamepad1.a = currentGamepad1.b;
                 currentGamepad1.b = temp;
-                temp = currentGamepad1.x;
-                currentGamepad1.x = currentGamepad1.y;
-                currentGamepad1.y = temp;
             }
 
             //SECONDARY DRIVER CONTROLS
@@ -162,6 +169,7 @@ public class MecOneDrive extends LinearOpMode
 
             //prevent rotation of robot when lift control up/down in use
             if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
+            if (ryanMode) speedFactor *= 1.2;
 
             speeds[0] = (drv + strafe + twist) * speedFactor;
             speeds[1] = (drv - strafe - twist) * speedFactor;
@@ -185,7 +193,7 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.right_bumper ){
                 if(robot.grabSpecimen()) {
-                    Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                    //Actions.runBlocking(new SequentialAction(wall2Bar.build()));
                     robot.liftTarget = barHeight;
                 }
                 else {
@@ -195,7 +203,7 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.left_bumper){
                 robot.releaseSpecimen();
-                Actions.runBlocking(new SequentialAction(bar2Wall.build()));
+                //Actions.runBlocking(new SequentialAction(bar2Wall.build()));
             }
 
             //Swivel the intake
@@ -216,7 +224,7 @@ public class MecOneDrive extends LinearOpMode
 
             //hang control
             if (currentGamepad1.back) robot.hang.setPower(-1);
-            else if(currentGamepad1.start && getRuntime() > 60){
+            else if(currentGamepad1.start ){
                 robot.hang.setPower(1);
                 robot.tiltTarget = 400;
             }

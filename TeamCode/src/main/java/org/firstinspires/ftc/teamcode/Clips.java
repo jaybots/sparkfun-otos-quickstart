@@ -32,11 +32,11 @@ public class Clips extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(34, -21), Math.PI / 2, new TranslationalVelConstraint(20))
                 .splineToConstantHeading(new Vector2d(43, -8), -Math.PI / 2, new TranslationalVelConstraint(20))
                 .splineToConstantHeading(new Vector2d(43, -46), -Math.PI / 2)
-                .strafeTo(new Vector2d(36,-46));
+                .strafeTo(new Vector2d(34,-46));
                 //.setTangent(Math.PI / 2)
                 //.splineToConstantHeading(new Vector2d(38, -52), -Math.PI / 2);
 
-        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(35, -56, -Math.PI / 2))
+        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(2, -27, Math.PI / 2), Math.PI / 2);
 
@@ -63,7 +63,6 @@ public class Clips extends LinearOpMode {
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
-            robot.twist.setPosition(robot.twistZero);
             boolean abort = false;
             if (isStopRequested()) return;
             robot.lift.setTargetPosition(2140);
