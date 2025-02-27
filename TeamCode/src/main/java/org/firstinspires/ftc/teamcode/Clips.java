@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.lang.Math;
-
+//
 
 @Autonomous(name = "Clips", group = "Right Side (Clip Red/Blue blocks)")
 public class Clips extends LinearOpMode {
