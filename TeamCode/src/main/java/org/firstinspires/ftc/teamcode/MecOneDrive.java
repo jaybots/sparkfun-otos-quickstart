@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -171,6 +169,8 @@ public class MecOneDrive extends LinearOpMode
             if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
             if (ryanMode) speedFactor *= 1.2;
 
+            
+
             speeds[0] = (drv + strafe + twist) * speedFactor;
             speeds[1] = (drv - strafe - twist) * speedFactor;
             speeds[2] = (drv - strafe + twist) * speedFactor;
@@ -217,9 +217,15 @@ public class MecOneDrive extends LinearOpMode
 
             //fast lift control
             if (currentGamepad1.x){
-                robot.twist.setPosition(robot.twistZero);
-                if (robot.liftPosition < barHeight) robot.liftTarget = barHeight;
-                else if (robot.liftPosition > barHeight -50) robot.liftTarget = robot.maxHeight;
+                if (robot.liftPosition < barHeight) {
+                    robot.liftTarget = barHeight;
+                    robot.tiltTarget  = 0;
+                    robot.twist.setPosition(1);
+                }
+                else if (robot.liftPosition > barHeight -50){
+                    robot.liftTarget = robot.maxHeight;
+                    robot.twist.setPosition(robot.twistZero);
+                }
             }
 
             //hang control
@@ -272,6 +278,7 @@ public class MecOneDrive extends LinearOpMode
                     if (currentGamepad1.x) {
                         robot.liftTarget = barHeight;
                         robot.tiltTarget = 0;
+                        robot.twist.setPosition(robot.twistZero);
                     }
                     if (currentGamepad1.a) {
                         robot.tiltTarget = tiltVertical;
