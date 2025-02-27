@@ -237,11 +237,13 @@ public class MecOneDrive extends LinearOpMode
             else robot.hang.setPower(0);
 
             //rotate tilt using dpad - doesn't prevent tilt from going higher than it should
+            double sf = 1;
+            if (ryanMode) sf = 1.1;
             if (currentGamepad1.dpad_down) {
-                robot.tiltTarget = Math.max(0, robot.tiltTarget - 30);
+                robot.tiltTarget = Math.max(0, robot.tiltTarget - (int)(30*sf));
             }
             else if (currentGamepad1.dpad_up){
-                robot.tiltTarget = Math.min(robot.tiltTarget + 30, robot.floor);
+                robot.tiltTarget = Math.min(robot.tiltTarget + (int)(30*sf), robot.floor);
             }
 
             //release is set to true if left trigger is squeezed
