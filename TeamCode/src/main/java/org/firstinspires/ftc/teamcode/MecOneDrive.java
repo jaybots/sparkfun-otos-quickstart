@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -34,14 +36,17 @@ public class MecOneDrive extends LinearOpMode
         robot.init(hardwareMap);
 
         SparkFunOTOS.Pose2D pos;
-        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(35,-56,-Math.PI/2));
+        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(40,-56,-Math.PI/2));
 
-        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(35, -56, -Math.PI / 2))
+        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(40, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(14, -29, Math.PI / 2), Math.PI / 2);
-        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -27, Math.PI / 2))
+                .splineToSplineHeading(new Pose2d(2, -28, Math.PI / 2), Math.PI / 2);
+
+        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -25, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(38, -52, -Math.PI / 2), -Math.PI / 2);
+                .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
+
+
 
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
@@ -193,8 +198,10 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.right_bumper ){
                 if(robot.grabSpecimen()) {
-                    //Actions.runBlocking(new SequentialAction(wall2Bar.build()));
                     robot.liftTarget = barHeight;
+                    robot.lift.setTargetPosition(barHeight);
+                    Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                    robot.forwardTime(.2,800);
                 }
                 else {
                     robot.claw.setPosition(robot.clawOpen);
@@ -203,7 +210,7 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.left_bumper){
                 robot.releaseSpecimen();
-                //Actions.runBlocking(new SequentialAction(bar2Wall.build()));
+                Actions.runBlocking(new SequentialAction(bar2Wall.build()));
             }
 
             //Swivel the intake

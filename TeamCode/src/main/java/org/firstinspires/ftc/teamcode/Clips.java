@@ -79,31 +79,39 @@ public class Clips extends LinearOpMode {
                 robot.backTime(.2,1000);
                 sleep(1000);
                 robot.forwardTime(.2,1200);
-                goodGrab = robot.grabSpecimen();
-            }
-            robot.lift.setTargetPosition(2050);
-            sleep(100);
-            robot.tilt.setTargetPosition(350);
-            Actions.runBlocking(new SequentialAction(wall2Bar.build()));
-            sleep(500);
-            robot.releaseSpecimen();
-            sleep(200);
-            robot.tilt.setTargetPosition(150);
-            Actions.runBlocking(new SequentialAction(bar2Wall.build()));
-            sleep(100);
-            robot.forwardTime(.2,1000);
-            while (!robot.grabSpecimen()) {
-                robot.backTime(.2,500);
-                sleep(1500);
-                robot.forwardTime(.2,650);
                 if (match.milliseconds()>25000){
                     abort = true;
                     break;
                 }
+                goodGrab = robot.grabSpecimen();
             }
             if (!abort) {
                 robot.lift.setTargetPosition(2050);
-                robot.tilt.setTargetPosition(200);
+                sleep(100);
+                robot.tilt.setTargetPosition(350);
+                Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                sleep(500);
+                robot.releaseSpecimen();
+                sleep(200);
+                robot.tilt.setTargetPosition(150);
+                Actions.runBlocking(new SequentialAction(bar2Wall.build()));
+                sleep(100);
+                robot.forwardTime(.2, 1000);
+                goodGrab = robot.grabSpecimen();
+                while (!goodGrab) {
+                    robot.backTime(.2, 500);
+                    sleep(1500);
+                    robot.forwardTime(.2, 650);
+                    if (match.milliseconds() > 25000) {
+                        abort = true;
+                        break;
+                    }
+                    goodGrab = robot.grabSpecimen();
+                }
+            }
+            if (!abort) {
+                robot.lift.setTargetPosition(2050);
+                robot.tilt.setTargetPosition(350);
                 sleep(100);
                 Actions.runBlocking(new SequentialAction(wall2Bar.build()));
                 sleep(500);
