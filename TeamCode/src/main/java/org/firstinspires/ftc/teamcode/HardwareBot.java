@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 public class HardwareBot
 {
     AnalogInput pixy = null;
-    DigitalChannel ir = null;
+    DigitalChannel touch = null;
     double pixyCenter = 1.85;
     double pixyRange = 0.1;
     ElapsedTime timer = new ElapsedTime();
@@ -34,7 +34,6 @@ public class HardwareBot
     public CRServo spin2 = null;
     public Servo claw = null;
     public ServoImplEx twist = null;
-
     public SparkFunOTOS odo;
     public double clawOpen = 0.2;
     public double clawClosed = 0.58;
@@ -64,7 +63,7 @@ public class HardwareBot
 
         // Define and Initialize Hardware
         pixy = hwMap.get(AnalogInput.class, "pixy");
-        ir = hwMap.get(DigitalChannel.class, "ir");
+        touch = hwMap.get(DigitalChannel.class, "touch");
         leftFront = hwMap.get(DcMotor.class, "left_front");
         rightFront = hwMap.get(DcMotor.class, "right_front");
         leftBack = hwMap.get(DcMotor.class, "left_back");
@@ -78,7 +77,7 @@ public class HardwareBot
         claw = hwMap.get(Servo.class, "claw");
         twist = hwMap.get(ServoImplEx.class, "twist");
 
-        ir.setMode(DigitalChannel.Mode.INPUT);
+        touch.setMode(DigitalChannel.Mode.INPUT);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
         leftFront.setDirection(DcMotor.Direction.FORWARD);
@@ -143,7 +142,7 @@ public class HardwareBot
         tiltTarget = 150;
         sleep(200);
         timer.reset();
-        forwardIr();
+        forwardTouch();
         double s = 0.25;
         //specimen not visible, return false, do nothing else
         if (pixy.getVoltage() < 0.1) {
@@ -259,17 +258,17 @@ public class HardwareBot
             stopWheels();
         }
 
-    public void forwardIr( ){
+    public void forwardTouch( ){
 
-        if (!ir.getState()) return;
-        double speed = 0.2;
-        while (ir.getState()) {
-            leftFront.setPower(speed);
-            rightFront.setPower(speed);
-            leftBack.setPower(speed);
-            rightBack.setPower(speed);
+        if (!touch.getState()) return;
+        sleeper.reset();
+        double speed = 0.3;
+        leftFront.setPower(speed);
+        rightFront.setPower(speed);
+        leftBack.setPower(speed);
+        rightBack.setPower(speed);
+        while (touch.getState() && sleeper.milliseconds()<2000) {
         }
-        sleep(500);
         stopWheels();
     }
 

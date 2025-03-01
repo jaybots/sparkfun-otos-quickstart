@@ -69,7 +69,7 @@ public class MecOneDrive extends LinearOpMode
             telemetry.addData("lift target", robot.liftTarget);
             telemetry.addData("lift amps", robot.lift.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("pixy", robot.pixy.getVoltage());
-            telemetry.addData("ir", robot.ir.getState());
+            telemetry.addData("touch", robot.touch.getState());
             telemetry.addData("time", getRuntime());
             telemetry.update();
             sleep(100);
@@ -81,13 +81,8 @@ public class MecOneDrive extends LinearOpMode
 
         while (opModeIsActive()) {
 
-            if (currentGamepad2.dpad_up) robot.forwardIr();
+            if (currentGamepad2.dpad_up) robot.forwardTouch();
 
-            telemetry.addData("lift pos", robot.liftPosition);
-            telemetry.addData("tilt pos", robot.tiltPosition);
-            telemetry.addData("pixy",robot.pixy.getVoltage());
-
-            telemetry.update();
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
 
 
@@ -177,8 +172,7 @@ public class MecOneDrive extends LinearOpMode
             //prevent rotation of robot when lift control up/down in use
             if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
             if (ryanMode) speedFactor *= 1.2;
-
-            
+            if (!robot.touch.getState()) speedFactor = 0.2;
 
             speeds[0] = (drv + strafe + twist) * speedFactor;
             speeds[1] = (drv - strafe - twist) * speedFactor;
@@ -207,7 +201,7 @@ public class MecOneDrive extends LinearOpMode
                     telemetry.addData("pixy",robot.pixy.getVoltage());
                     telemetry.update();
                     runBlocking(new SequentialAction(wall2Bar.build()));
-                    robot.forwardIr();
+                    robot.forwardTouch();
                 }
                 else {
                     robot.claw.setPosition(robot.clawOpen);

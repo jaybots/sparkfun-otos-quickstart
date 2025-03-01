@@ -67,12 +67,12 @@ public class Clips extends LinearOpMode {
             robot.releaseSpecimen();
             robot.tilt.setTargetPosition(150);
             runBlocking(new SequentialAction(pushBlock.build()));
-            robot.forwardIr();
+            robot.forwardTouch();
             boolean goodGrab = robot.grabSpecimen();
             while (!goodGrab) {
                 robot.backTime(.2,1000);
                 sleep(1000);
-                robot.forwardIr();
+                robot.forwardTouch();
                 if (match.milliseconds()>25000){
                     abort = true;
                     break;
@@ -91,12 +91,12 @@ public class Clips extends LinearOpMode {
                 robot.tilt.setTargetPosition(150);
                 runBlocking(new SequentialAction(bar2Wall.build()));
                 sleep(100);
-                robot.forwardIr();
+                robot.forwardTouch();
                 goodGrab = robot.grabSpecimen();
                 while (!goodGrab) {
                     robot.backTime(.2, 500);
                     sleep(1500);
-                    robot.forwardIr();
+                    robot.forwardTouch();
                     if (match.milliseconds() > 25000) {
                         abort = true;
                         break;
