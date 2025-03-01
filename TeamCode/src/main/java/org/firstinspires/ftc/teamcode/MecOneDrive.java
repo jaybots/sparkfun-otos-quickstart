@@ -35,6 +35,8 @@ public class MecOneDrive extends LinearOpMode
     @Override
     public void runOpMode() {
 
+
+
         robot.init(hardwareMap);
 
         SparkFunOTOS.Pose2D pos;
@@ -44,7 +46,7 @@ public class MecOneDrive extends LinearOpMode
                 .setTangent(Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(2, -28, Math.PI / 2), Math.PI / 2);
 
-        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -25, Math.PI / 2))
+        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -26, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
 
@@ -79,9 +81,11 @@ public class MecOneDrive extends LinearOpMode
 
         while (opModeIsActive()) {
 
+            if (currentGamepad2.dpad_up) robot.forwardIr();
+
             telemetry.addData("lift pos", robot.liftPosition);
             telemetry.addData("tilt pos", robot.tiltPosition);
-            telemetry.addData("ir",robot.ir.getState());
+            telemetry.addData("pixy",robot.pixy.getVoltage());
 
             telemetry.update();
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
@@ -200,6 +204,8 @@ public class MecOneDrive extends LinearOpMode
                 if(robot.grabSpecimen()) {
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
+                    telemetry.addData("pixy",robot.pixy.getVoltage());
+                    telemetry.update();
                     runBlocking(new SequentialAction(wall2Bar.build()));
                     robot.forwardIr();
                 }
@@ -211,6 +217,7 @@ public class MecOneDrive extends LinearOpMode
             if (currentGamepad1.left_bumper && robot.liftPosition > barHeight*.8){
                 robot.releaseSpecimen();
                 runBlocking(new SequentialAction(bar2Wall.build()));
+                robot.liftTarget = 0;
 
             }
 

@@ -14,7 +14,6 @@ public class HardwareBot
 {
     AnalogInput pixy = null;
     DigitalChannel ir = null;
-    double voltage = 0;
     double pixyCenter = 1.85;
     double pixyRange = 0.1;
     ElapsedTime timer = new ElapsedTime();
@@ -61,7 +60,7 @@ public class HardwareBot
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
-        sleep(100);
+
 
         // Define and Initialize Hardware
         pixy = hwMap.get(AnalogInput.class, "pixy");
@@ -144,7 +143,7 @@ public class HardwareBot
         tiltTarget = 150;
         sleep(200);
         timer.reset();
-        pixy.getVoltage();
+        forwardIr();
         double s = 0.25;
         //specimen not visible, return false, do nothing else
         if (pixy.getVoltage() < 0.1) {
@@ -168,15 +167,16 @@ public class HardwareBot
             }
 
         }
-        forwardIr();
+        stopWheels();
         claw.setPosition(clawClosed);
         sleep(400);
-        liftTarget = 500;
+        liftTarget = 1000;
         lift.setTargetPosition(liftTarget);
         sleep(500);
+        tilt.setPower(0);
         tiltTarget = 0;
         tilt.setTargetPosition(tiltTarget);
-        if (pixy.getVoltage() < .1){
+        if (pixy.getVoltage() < 1){
             claw.setPosition(clawOpen);
             liftTarget = 0;
             lift.setTargetPosition(0);
@@ -192,8 +192,8 @@ public class HardwareBot
          */
         public void releaseSpecimen () {
             lift.setPower(1);
-            liftTarget = 0;
-            lift.setTargetPosition(0);
+            liftTarget = -10;
+            lift.setTargetPosition(-10);
             sleep(300);
             claw.setPosition(clawOpen);
             tiltTarget = 150;
@@ -260,7 +260,8 @@ public class HardwareBot
         }
 
     public void forwardIr( ){
-        if (ir.getState()) return;
+
+        if (!ir.getState()) return;
         double speed = 0.2;
         while (ir.getState()) {
             leftFront.setPower(speed);
@@ -268,6 +269,7 @@ public class HardwareBot
             leftBack.setPower(speed);
             rightBack.setPower(speed);
         }
+        sleep(500);
         stopWheels();
     }
 
@@ -319,6 +321,7 @@ public class HardwareBot
         public void sleep ( int x){
             sleeper.reset();
             while (sleeper.milliseconds() < x) {
+                pixy.getVoltage();
             }
         }
 
