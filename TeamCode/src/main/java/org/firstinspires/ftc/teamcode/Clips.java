@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
@@ -33,8 +35,6 @@ public class Clips extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(43, -8), -Math.PI / 2, new TranslationalVelConstraint(20))
                 .splineToConstantHeading(new Vector2d(43, -46), -Math.PI / 2)
                 .strafeTo(new Vector2d(34,-46));
-                //.setTangent(Math.PI / 2)
-                //.splineToConstantHeading(new Vector2d(38, -52), -Math.PI / 2);
 
         TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
@@ -47,12 +47,6 @@ public class Clips extends LinearOpMode {
         TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(2, -27, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(38, -52, Math.PI / 2), 0);
-
-        TrajectoryActionBuilder right10 = drive.actionBuilder(new Pose2d(46,-42 , -Math.PI / 2))
-                .strafeTo(new Vector2d(36,-44));
-
-
-
 
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
@@ -68,11 +62,11 @@ public class Clips extends LinearOpMode {
             robot.lift.setTargetPosition(2140);
             robot.tilt.setTargetPosition(300);
             sleep(200);
-            Actions.runBlocking(new SequentialAction(start.build()));
+            runBlocking(new SequentialAction(start.build()));
             sleep(300);
             robot.releaseSpecimen();
             robot.tilt.setTargetPosition(150);
-            Actions.runBlocking(new SequentialAction(pushBlock.build()));
+            runBlocking(new SequentialAction(pushBlock.build()));
             robot.forwardTime(.3,1200);
             boolean goodGrab = robot.grabSpecimen();
             while (!goodGrab) {
@@ -89,12 +83,12 @@ public class Clips extends LinearOpMode {
                 robot.lift.setTargetPosition(2050);
                 sleep(100);
                 robot.tilt.setTargetPosition(350);
-                Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                runBlocking(new SequentialAction(wall2Bar.build()));
                 sleep(500);
                 robot.releaseSpecimen();
                 sleep(200);
                 robot.tilt.setTargetPosition(150);
-                Actions.runBlocking(new SequentialAction(bar2Wall.build()));
+                runBlocking(new SequentialAction(bar2Wall.build()));
                 sleep(100);
                 robot.forwardTime(.2, 1000);
                 goodGrab = robot.grabSpecimen();
@@ -113,12 +107,12 @@ public class Clips extends LinearOpMode {
                 robot.lift.setTargetPosition(2050);
                 robot.tilt.setTargetPosition(350);
                 sleep(100);
-                Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                runBlocking(new SequentialAction(wall2Bar.build()));
                 sleep(500);
                 robot.releaseSpecimen();
                 robot.tilt.setTargetPosition(0);
                 sleep(200);
-                Actions.runBlocking(new SequentialAction(park.build()));
+                runBlocking(new SequentialAction(park.build()));
             }
             done = true;
         } //while opModeIsActive

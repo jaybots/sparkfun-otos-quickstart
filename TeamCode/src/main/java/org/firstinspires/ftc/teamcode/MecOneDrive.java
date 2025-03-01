@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode;
+import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
@@ -46,8 +48,6 @@ public class MecOneDrive extends LinearOpMode
                 .setTangent(-Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
 
-
-
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
 
@@ -67,7 +67,7 @@ public class MecOneDrive extends LinearOpMode
             telemetry.addData("lift target", robot.liftTarget);
             telemetry.addData("lift amps", robot.lift.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("pixy", robot.pixy.getVoltage());
-            telemetry.addData("sonar", robot.sonar.getVoltage());
+            telemetry.addData("ir", robot.ir.getVoltage());
             telemetry.addData("time", getRuntime());
             telemetry.update();
             sleep(100);
@@ -81,7 +81,7 @@ public class MecOneDrive extends LinearOpMode
 
             telemetry.addData("lift pos", robot.liftPosition);
             telemetry.addData("tilt pos", robot.tiltPosition);
-            telemetry.addData("pixy",robot.pixy.getVoltage());
+            telemetry.addData("ir",robot.ir.getVoltage());
 
             telemetry.update();
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
@@ -196,11 +196,11 @@ public class MecOneDrive extends LinearOpMode
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
 
-            if (currentGamepad1.right_bumper ){
+            if (currentGamepad1.right_bumper && robot.liftPosition <100 ){
                 if(robot.grabSpecimen()) {
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
-                    Actions.runBlocking(new SequentialAction(wall2Bar.build()));
+                    runBlocking(new SequentialAction(wall2Bar.build()));
                     robot.forwardTime(.2,800);
                 }
                 else {
@@ -208,9 +208,11 @@ public class MecOneDrive extends LinearOpMode
                 }
             }
 
-            if (currentGamepad1.left_bumper){
+            if (currentGamepad1.left_bumper && robot.liftPosition > barHeight*.8){
                 robot.releaseSpecimen();
-                Actions.runBlocking(new SequentialAction(bar2Wall.build()));
+                robot.lift.setTargetPosition(-5);
+                runBlocking(new SequentialAction(bar2Wall.build()));
+                robot.lift.setTargetPosition(0);
             }
 
             //Swivel the intake
@@ -280,8 +282,6 @@ public class MecOneDrive extends LinearOpMode
             switch  (driveMode){
                 //CONTROLS FOR BASIC DRIVE MODE
                 case ADRIVE:
-
-
 
                     //fastest driving speeds
                     if (currentGamepad1.x) {

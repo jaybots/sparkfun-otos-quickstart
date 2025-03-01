@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class HardwareBot
 {
     AnalogInput pixy = null;
-    AnalogInput sonar = null;
+    AnalogInput ir = null;
     double voltage = 0;
     double pixyCenter = 1.85;
     double pixyRange = 0.1;
@@ -64,7 +64,7 @@ public class HardwareBot
 
         // Define and Initialize Hardware
         pixy = hwMap.get(AnalogInput.class, "pixy");
-        sonar = hwMap.get(AnalogInput.class, "sonar");
+        ir = hwMap.get(AnalogInput.class, "ir");
         leftFront = hwMap.get(DcMotor.class, "left_front");
         rightFront = hwMap.get(DcMotor.class, "right_front");
         leftBack = hwMap.get(DcMotor.class, "left_back");
