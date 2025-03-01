@@ -77,6 +77,7 @@ public class Clips extends LinearOpMode {
                     abort = true;
                     break;
                 }
+                if (abort) break;
                 goodGrab = robot.grabSpecimen();
             }
             if (!abort) {
