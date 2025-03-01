@@ -8,11 +8,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 //
 public class HardwareBot
 {
     AnalogInput pixy = null;
-    AnalogInput ir = null;
+    DigitalChannel ir = null;
     double voltage = 0;
     double pixyCenter = 1.85;
     double pixyRange = 0.1;
@@ -64,7 +65,7 @@ public class HardwareBot
 
         // Define and Initialize Hardware
         pixy = hwMap.get(AnalogInput.class, "pixy");
-        ir = hwMap.get(AnalogInput.class, "ir");
+        ir = hwMap.get(DigitalChannel.class, "ir");
         leftFront = hwMap.get(DcMotor.class, "left_front");
         rightFront = hwMap.get(DcMotor.class, "right_front");
         leftBack = hwMap.get(DcMotor.class, "left_back");
@@ -78,7 +79,7 @@ public class HardwareBot
         claw = hwMap.get(Servo.class, "claw");
         twist = hwMap.get(ServoImplEx.class, "twist");
 
-
+        ir.setMode(DigitalChannel.Mode.INPUT);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
         leftFront.setDirection(DcMotor.Direction.FORWARD);
@@ -167,7 +168,7 @@ public class HardwareBot
             }
 
         }
-        forwardTime(.2,300);
+        forwardIr();
         claw.setPosition(clawClosed);
         sleep(400);
         liftTarget = 500;
@@ -184,7 +185,6 @@ public class HardwareBot
         }
         led.setPower(0);
         return true;
-
     }
 
         /**
@@ -258,6 +258,18 @@ public class HardwareBot
             sleep(time);
             stopWheels();
         }
+
+    public void forwardIr( ){
+        if (ir.getState()) return;
+        double speed = 0.2;
+        while (ir.getState()) {
+            leftFront.setPower(speed);
+            rightFront.setPower(speed);
+            leftBack.setPower(speed);
+            rightBack.setPower(speed);
+        }
+        stopWheels();
+    }
 
         /**
          * Drives backward using time

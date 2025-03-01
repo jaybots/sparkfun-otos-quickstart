@@ -67,7 +67,7 @@ public class MecOneDrive extends LinearOpMode
             telemetry.addData("lift target", robot.liftTarget);
             telemetry.addData("lift amps", robot.lift.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("pixy", robot.pixy.getVoltage());
-            telemetry.addData("ir", robot.ir.getVoltage());
+            telemetry.addData("ir", robot.ir.getState());
             telemetry.addData("time", getRuntime());
             telemetry.update();
             sleep(100);
@@ -81,7 +81,7 @@ public class MecOneDrive extends LinearOpMode
 
             telemetry.addData("lift pos", robot.liftPosition);
             telemetry.addData("tilt pos", robot.tiltPosition);
-            telemetry.addData("ir",robot.ir.getVoltage());
+            telemetry.addData("ir",robot.ir.getState());
 
             telemetry.update();
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
@@ -201,7 +201,7 @@ public class MecOneDrive extends LinearOpMode
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
                     runBlocking(new SequentialAction(wall2Bar.build()));
-                    robot.forwardTime(.2,800);
+                    robot.forwardIr();
                 }
                 else {
                     robot.claw.setPosition(robot.clawOpen);
@@ -210,9 +210,8 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.left_bumper && robot.liftPosition > barHeight*.8){
                 robot.releaseSpecimen();
-                robot.lift.setTargetPosition(-5);
                 runBlocking(new SequentialAction(bar2Wall.build()));
-                robot.lift.setTargetPosition(0);
+
             }
 
             //Swivel the intake
