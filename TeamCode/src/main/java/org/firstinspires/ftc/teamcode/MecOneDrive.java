@@ -4,7 +4,6 @@ import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -18,6 +17,7 @@ import java.lang.Math;
 @TeleOp(name="MecOneDrive")
 public class MecOneDrive extends LinearOpMode
 {
+    double startTime = 0;
     ElapsedTime ampTimer = new ElapsedTime();
     boolean ryanMode = false;
     double amps = 0;
@@ -74,12 +74,15 @@ public class MecOneDrive extends LinearOpMode
             telemetry.update();
             sleep(100);
         }
+        startTime = getRuntime();
         robot.tilt.setPower(robot.tiltPower);
         robot.lift.setPower(robot.liftPower);
         double[] speeds = {0, 0, 0, 0};
         robot.twist.setPosition(robot.twistZero);
 
         while (opModeIsActive()) {
+            telemetry.addData("time", getRuntime()-startTime);
+            telemetry.update();
 
             if (currentGamepad2.dpad_up) robot.forwardTouch();
 

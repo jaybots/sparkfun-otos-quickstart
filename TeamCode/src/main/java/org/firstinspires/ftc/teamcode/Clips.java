@@ -7,7 +7,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -19,6 +18,8 @@ public class Clips extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
 
     ElapsedTime match = new ElapsedTime();
+    int cutTime = 25;
+    double startTime=0;
 
     public void runOpMode() {
         robot.init(hardwareMap);
@@ -53,11 +54,11 @@ public class Clips extends LinearOpMode {
             telemetry.addData("ready to", "start");
             telemetry.update();
         }
+        startTime = getRuntime();
         boolean done = false;
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
-            boolean abort = false;
             if (isStopRequested()) return;
             robot.lift.setTargetPosition(2140);
             robot.tilt.setTargetPosition(300);
@@ -73,14 +74,12 @@ public class Clips extends LinearOpMode {
                 robot.backTime(.2,1000);
                 sleep(1000);
                 robot.forwardTouch();
-                if (match.milliseconds()>25000){
-                    abort = true;
+                if (getRuntime()-startTime>cutTime){
                     break;
                 }
-                if (abort) break;
                 goodGrab = robot.grabSpecimen();
             }
-            if (!abort) {
+            if (getRuntime()-startTime<cutTime) {
                 robot.lift.setTargetPosition(2050);
                 sleep(100);
                 robot.tilt.setTargetPosition(350);
@@ -97,25 +96,21 @@ public class Clips extends LinearOpMode {
                     robot.backTime(.2, 500);
                     sleep(1500);
                     robot.forwardTouch();
-                    if (match.milliseconds() > 25000) {
-                        abort = true;
+                    if (getRuntime()-startTime > 25000) {
                         break;
                     }
-                    if (abort) break;
                     goodGrab = robot.grabSpecimen();
                 }
             }
-            if (!abort) {
-                robot.lift.setTargetPosition(2050);
-                robot.tilt.setTargetPosition(350);
-                sleep(100);
-                runBlocking(new SequentialAction(wall2Bar.build()));
-                sleep(500);
-                robot.releaseSpecimen();
-                robot.tilt.setTargetPosition(0);
-                sleep(200);
-                runBlocking(new SequentialAction(park.build()));
-            }
+            robot.lift.setTargetPosition(2050);
+            robot.tilt.setTargetPosition(350);
+            sleep(100);
+            runBlocking(new SequentialAction(wall2Bar.build()));
+            sleep(500);
+            robot.releaseSpecimen();
+            robot.tilt.setTargetPosition(0);
+            sleep(200);
+            runBlocking(new SequentialAction(park.build()));
             done = true;
         } //while opModeIsActive
     }  //ends runOpMode
