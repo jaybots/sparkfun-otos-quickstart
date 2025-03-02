@@ -16,7 +16,8 @@ public class HighBasket extends LinearOpMode {
     public void runOpMode() {
         robot.init(hardwareMap);
 
-        Pose2d initialPose = new Pose2d(-7, -61, Math.toRadians(90));
+        //start so right wheels are on edge of tile even with angled support (facing submersible)
+        Pose2d initialPose = new Pose2d(-30, -61, Math.toRadians(90));
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
 
@@ -37,27 +38,26 @@ public class HighBasket extends LinearOpMode {
         robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
-            sleep(1500);
+            robot.twist.setPosition(robot.twistZero);
+            robot.claw.setPosition(robot.clawOpen);
             Actions.runBlocking(new SequentialAction(tab1.build()));
-            //robot.lift.setTargetPosition(3500);
-            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(1,0 ),0));
-            sleep(2000);
-            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0 ),0));
+            robot.lift.setTargetPosition(robot.maxHeight);
+            while (robot.lift.getCurrentPosition()<robot.maxHeight - 100) {}
+            robot.tilt.setTargetPosition(150);
+            robot.forwardTime(.2,1500);
             robot.spin1.setPower(-1);
             robot.spin2.setPower(1);
-            sleep(1500);
+            sleep(2000);
+            robot.tilt.setTargetPosition(0);
             robot.spin1.setPower(0);
             robot.spin2.setPower(0);
-            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-1,0 ),0));
-            sleep(1000);
-            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0,0 ),0));
-            //robot.lift.setTargetPosition(0)
+            robot.backTime(.2,1000);
+            robot.lift.setTargetPosition(0);
             sleep(2000);
             Actions.runBlocking(new SequentialAction(tab2.build()));
             sleep(100);
-            drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-1,0 ),0));
-            sleep(3000);
-            robot.hang.setPower(-.5);
+            robot.backTime(.2,3000);
+            robot.hang.setPower(.5);
             sleep(2500);
             robot.hang.setPower(0);
             done = true;

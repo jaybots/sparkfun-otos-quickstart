@@ -44,7 +44,7 @@ public class HardwareBot
     public int liftTarget = 0;
     public int tiltTarget = 0;
     public int floor = 2400;
-    public int maxHeight = 3400;
+    public int maxHeight = 3600;
     public double twistZero = 0.52;
     public double twistPosition = 0.52;
     HardwareMap hwMap  =  null;
@@ -191,8 +191,8 @@ public class HardwareBot
          */
         public void releaseSpecimen () {
             lift.setPower(1);
-            liftTarget = -10;
-            lift.setTargetPosition(-10);
+            liftTarget = -25;
+            lift.setTargetPosition(-25);
             sleep(300);
             claw.setPosition(clawOpen);
             tiltTarget = 150;
@@ -259,8 +259,9 @@ public class HardwareBot
         }
 
     public void forwardTouch( ){
-
-        if (!touch.getState()) return;
+        if (!touch.getState()) {
+            return;
+        }
         sleeper.reset();
         double speed = 0.3;
         leftFront.setPower(speed);

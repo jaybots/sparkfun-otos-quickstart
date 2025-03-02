@@ -17,7 +17,7 @@ import java.lang.Math;
 public class Clips extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
 
-    ElapsedTime match = new ElapsedTime();
+    //ElapsedTime match = new ElapsedTime();
     int cutTime = 25;
     double startTime=0;
 
@@ -82,14 +82,14 @@ public class Clips extends LinearOpMode {
             if (getRuntime()-startTime<cutTime) {
                 robot.lift.setTargetPosition(2050);
                 sleep(100);
-                robot.tilt.setTargetPosition(350);
+                robot.tilt.setTargetPosition(0);
                 runBlocking(new SequentialAction(wall2Bar.build()));
-                sleep(500);
+                robot.touch.getState();
+                robot.forwardTouch();
                 robot.releaseSpecimen();
-                sleep(200);
                 robot.tilt.setTargetPosition(150);
                 runBlocking(new SequentialAction(bar2Wall.build()));
-                sleep(100);
+                robot.touch.getState();
                 robot.forwardTouch();
                 goodGrab = robot.grabSpecimen();
                 while (!goodGrab) {
@@ -103,13 +103,13 @@ public class Clips extends LinearOpMode {
                 }
             }
             robot.lift.setTargetPosition(2050);
-            robot.tilt.setTargetPosition(350);
             sleep(100);
-            runBlocking(new SequentialAction(wall2Bar.build()));
-            sleep(500);
-            robot.releaseSpecimen();
             robot.tilt.setTargetPosition(0);
-            sleep(200);
+            runBlocking(new SequentialAction(wall2Bar.build()));
+            robot.touch.getState();
+            robot.forwardTouch();
+            robot.releaseSpecimen();
+            robot.tilt.setTargetPosition(150);
             runBlocking(new SequentialAction(park.build()));
             done = true;
         } //while opModeIsActive

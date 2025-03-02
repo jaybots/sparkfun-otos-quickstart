@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import java.lang.Math;
 
 //
@@ -18,6 +17,8 @@ import java.lang.Math;
 public class MecOneDrive extends LinearOpMode
 {
     double startTime = 0;
+    int runs = 0;
+    ElapsedTime timer = new ElapsedTime();
     ElapsedTime ampTimer = new ElapsedTime();
     boolean ryanMode = false;
     double amps = 0;
@@ -39,18 +40,17 @@ public class MecOneDrive extends LinearOpMode
 
         robot.init(hardwareMap);
 
-        SparkFunOTOS.Pose2D pos;
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(40,-56,-Math.PI/2));
 
-        TrajectoryActionBuilder[] wall2Bar = new TrajectoryActionBuilder[8];
-        TrajectoryActionBuilder[] bar2Wall = new TrajectoryActionBuilder[8];
+        TrajectoryActionBuilder[] wall2Bar = new TrajectoryActionBuilder[4];
+        TrajectoryActionBuilder[] bar2Wall = new TrajectoryActionBuilder[4];
 
-        for (int i = 0;i<8;i++) {
-            wall2Bar[i] = drive.actionBuilder(new Pose2d(40, -56, -Math.PI / 2))
+        for (int i = 0;i<=9;i+=3) {
+            wall2Bar[i/3] = drive.actionBuilder(new Pose2d(40-runs, -56+runs, -Math.PI / 2))
                     .setTangent(Math.PI / 2)
-                    .splineToSplineHeading(new Pose2d(-2+i, -28, Math.PI / 2), Math.PI / 2);
+                    .splineToSplineHeading(new Pose2d(i-4, -28, Math.PI / 2), Math.PI / 2);
 
-            bar2Wall[i] = drive.actionBuilder(new Pose2d(-2+i, -26, Math.PI / 2))
+            bar2Wall[i/3] = drive.actionBuilder(new Pose2d(i-4-runs, -26+runs, Math.PI / 2))
                     .setTangent(-Math.PI / 2)
                     .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
         }
@@ -90,7 +90,7 @@ public class MecOneDrive extends LinearOpMode
         robot.led.setPower(0);
 
         while (opModeIsActive()) {
-            telemetry.addData("time", getRuntime()-startTime);
+            telemetry.addData("touch", robot.touch.getState());
             telemetry.update();
 
             if (currentGamepad2.dpad_up) robot.forwardTouch();
@@ -178,13 +178,13 @@ public class MecOneDrive extends LinearOpMode
 
             //wheel control
             drv  = -currentGamepad1.left_stick_y;
+            if (!robot.touch.getState() && drv > 0.2 ) drv = 0.2;
             strafe = currentGamepad1.left_stick_x*.75;
             twist  = currentGamepad1.right_stick_x*.75;
 
             //prevent rotation of robot when lift control up/down in use
             if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
             if (ryanMode) speedFactor *= 1.2;
-            if (!robot.touch.getState()) speedFactor = 0.2;
 
             speeds[0] = (drv + strafe + twist) * speedFactor;
             speeds[1] = (drv - strafe - twist) * speedFactor;
@@ -210,9 +210,8 @@ public class MecOneDrive extends LinearOpMode
                 if(robot.grabSpecimen()) {
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
-                    telemetry.addData("pixy",robot.pixy.getVoltage());
-                    telemetry.update();
                     runBlocking(new SequentialAction(wall2Bar[specimenCount].build()));
+                    robot.touch.getState();
                     robot.forwardTouch();
                 }
                 else {
@@ -224,8 +223,12 @@ public class MecOneDrive extends LinearOpMode
                 robot.releaseSpecimen();
                 runBlocking(new SequentialAction(bar2Wall[specimenCount].build()));
                 specimenCount++;
+                runs++;
+                if (specimenCount==4) specimenCount = 0;
                 robot.liftTarget = 0;
-
+                robot.lift.setTargetPosition(robot.liftTarget);
+                robot.touch.getState();
+                robot.forwardTouch();
             }
 
             //Swivel the intake
