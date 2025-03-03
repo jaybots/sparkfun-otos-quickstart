@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
-@Autonomous(name = "Left Side (yellow to high basket)")
-public class HighBasket extends LinearOpMode {
+@Autonomous(name = "Yellow 2 samples in basket")
+public class Yellow2 extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
 
     public void runOpMode() {
@@ -29,6 +29,11 @@ public class HighBasket extends LinearOpMode {
                 .setTangent(Math.toRadians(45))
                 .splineTo(new Vector2d(-30,-9),Math.toRadians(0));
 
+        TrajectoryActionBuilder tab3 = drive.actionBuilder(new Pose2d(-51, -50,Math.toRadians(225) ))
+                .turnTo(Math.toRadians(75));
+
+
+
         while (!isStopRequested() && !opModeIsActive()) {
             sleep(100);
             telemetry.addData("ready to","start");
@@ -44,16 +49,29 @@ public class HighBasket extends LinearOpMode {
             robot.lift.setTargetPosition(robot.maxHeight);
             while (robot.lift.getCurrentPosition()<robot.maxHeight - 100) {}
             robot.tilt.setTargetPosition(150);
-            robot.forwardTime(.2,1500);
+            robot.forwardTime(.2,1000);
             robot.spin1.setPower(-1);
             robot.spin2.setPower(1);
-            sleep(1000);
+            sleep(1500);
             robot.tilt.setTargetPosition(0);
             robot.spin1.setPower(0);
             robot.spin2.setPower(0);
             robot.backTime(.2,1000);
-            robot.lift.setTargetPosition(0);
-            sleep(2000);
+            robot.lift.setTargetPosition(1500);
+            sleep(1000);
+            Actions.runBlocking(new SequentialAction(tab3.build()));
+            robot.tilt.setTargetPosition(2150);
+            sleep(1000);
+            robot.lift.setTargetPosition(1700);
+            robot.liftTarget=1700;
+            robot.leftPixy();
+            robot.retractPixy();
+            robot.spinIn();
+            robot.tilt.setTargetPosition(2300);
+            sleep(1000);
+            robot.spinStop();
+            robot.tilt.setTargetPosition(0);
+            sleep(10000);
             Actions.runBlocking(new SequentialAction(tab2.build()));
             sleep(100);
             robot.backTime(.2,3000);

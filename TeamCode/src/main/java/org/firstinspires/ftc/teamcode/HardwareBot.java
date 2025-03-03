@@ -301,6 +301,32 @@ public class HardwareBot
             sleep(time);
             stopWheels();
         }
+    public void retractPixy (){
+        while (pixy.getVoltage() > .1 && liftPosition > 1540){
+            liftPosition--;
+            lift.setTargetPosition(liftPosition);
+        }
+    }
+    public void rightPixy (){
+        double speed = 0.15;
+        leftFront.setPower(speed);
+        rightFront.setPower(-speed);
+        leftBack.setPower(speed);
+        rightBack.setPower(-speed);
+        while (pixy.getVoltage() < 1.6){
+        }
+        stopWheels();
+    }
+    public void leftPixy (){
+        double speed = 0.1;
+        leftFront.setPower(-speed);
+        rightFront.setPower(speed);
+        leftBack.setPower(-speed);
+        rightBack.setPower(speed);
+        while (pixy.getVoltage() < 1.7 || pixy.getVoltage() > 1.9){
+        }
+        stopWheels();
+    }
         /**
          * Drives left a set amount of time, then stops wheels
          * @param time in milliseconds

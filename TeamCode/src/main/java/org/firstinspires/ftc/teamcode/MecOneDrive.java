@@ -91,6 +91,8 @@ public class MecOneDrive extends LinearOpMode
 
         while (opModeIsActive()) {
             telemetry.addData("touch", robot.touch.getState());
+            telemetry.addData("tilt pos", robot.tilt.getCurrentPosition());
+            telemetry.addData("lift pos", robot.lift.getCurrentPosition());
             telemetry.update();
 
             if (currentGamepad2.dpad_up) robot.forwardTouch();
