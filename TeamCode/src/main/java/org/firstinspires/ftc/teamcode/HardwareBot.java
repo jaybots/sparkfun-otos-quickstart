@@ -140,6 +140,7 @@ public class HardwareBot
         led.setPower(0.5);
         tilt.setTargetPosition(150);
         tiltTarget = 150;
+        touch.getState();
         sleep(200);
         timer.reset();
         forwardTouch();
