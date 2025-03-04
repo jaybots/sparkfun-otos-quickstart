@@ -62,8 +62,8 @@ public class Yellow2 extends LinearOpMode {
             Actions.runBlocking(new SequentialAction(tab3.build()));
             robot.tilt.setTargetPosition(2150);
             sleep(1000);
-            robot.lift.setTargetPosition(1700);
-            robot.liftTarget=1700;
+            robot.lift.setTargetPosition(1500);
+            robot.liftTarget=1500;
             robot.leftPixy();
             robot.retractPixy();
             robot.spinIn();
