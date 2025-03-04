@@ -45,15 +45,22 @@ public class MecOneDrive extends LinearOpMode
         TrajectoryActionBuilder[] wall2Bar = new TrajectoryActionBuilder[4];
         TrajectoryActionBuilder[] bar2Wall = new TrajectoryActionBuilder[4];
 
+        TrajectoryActionBuilder wallPos = drive.actionBuilder(new Pose2d(40, -56, -Math.PI / 2));
+
+        TrajectoryActionBuilder barPos = drive.actionBuilder(new Pose2d(-4, -26, Math.PI / 2));
+
+
+
         for (int i = 0;i<=9;i+=3) {
-            wall2Bar[i/3] = drive.actionBuilder(new Pose2d(40-runs, -56+runs, -Math.PI / 2))
+            wall2Bar[i/3] = wallPos.endTrajectory().fresh()
                     .setTangent(Math.PI / 2)
                     .splineToSplineHeading(new Pose2d(i-4, -28, Math.PI / 2), Math.PI / 2);
 
-            bar2Wall[i/3] = drive.actionBuilder(new Pose2d(i-4-runs, -26+runs, Math.PI / 2))
+            bar2Wall[i/3] = barPos.endTrajectory().fresh()
                     .setTangent(-Math.PI / 2)
                     .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
         }
+
 
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
@@ -212,6 +219,7 @@ public class MecOneDrive extends LinearOpMode
                 if(robot.grabSpecimen()) {
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
+                    runBlocking(new SequentialAction(wallPos.build()));
                     runBlocking(new SequentialAction(wall2Bar[specimenCount].build()));
                     robot.touch.getState();
                     robot.forwardTouch();
@@ -223,6 +231,7 @@ public class MecOneDrive extends LinearOpMode
 
             if (currentGamepad1.left_bumper && robot.liftPosition > barHeight*.8){
                 robot.releaseSpecimen();
+                runBlocking(new SequentialAction(barPos.build()));
                 runBlocking(new SequentialAction(bar2Wall[specimenCount].build()));
                 specimenCount++;
                 runs++;
@@ -260,6 +269,7 @@ public class MecOneDrive extends LinearOpMode
             else if(currentGamepad1.start ){
                 robot.hang.setPower(1);
                 robot.tiltTarget = 400;
+                robot.tilt.setTargetPosition(400);
             }
             else robot.hang.setPower(0);
 

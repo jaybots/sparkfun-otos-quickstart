@@ -260,7 +260,8 @@ public class HardwareBot
         }
 
     public void forwardTouch( ){
-        if (!touch.getState()) {
+        forwardTime(.2,1000);
+        if (touch.getState()) {
             return;
         }
         sleeper.reset();

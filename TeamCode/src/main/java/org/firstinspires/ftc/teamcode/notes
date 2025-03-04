@@ -1,22 +1,11 @@
-       TrajectoryActionBuilder start = drive.actionBuilder(initialPose)
-                .lineToY(-29);
+        for (int i = 0;i<=9;i+=3) {
+            wall2Bar[i/3] = drive.actionBuilder(new Pose2d(40-runs, -56+runs, -Math.PI / 2))
+                    .fresh()
+                    .setTangent(Math.PI / 2)
+                    .splineToSplineHeading(new Pose2d(i-4, -28, Math.PI / 2), Math.PI / 2);
 
-        TrajectoryActionBuilder pushBlock = drive.actionBuilder(new Pose2d(7, -29, Math.PI / 2))
-                .setTangent(-Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(34, -34, -Math.PI / 2), Math.PI / 2)
-                .splineToConstantHeading(new Vector2d(34, -21), Math.PI / 2, new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(43, -8), -Math.PI / 2, new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(43, -46), -Math.PI / 2)
-                .strafeTo(new Vector2d(34,-46));
-
-        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
-                .setTangent(Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(2, -27, Math.PI / 2), Math.PI / 2);
-
-        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -27, Math.PI / 2))
-                .setTangent(-Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(38, -52, -Math.PI / 2), -Math.PI / 2);
-
-        TrajectoryActionBuilder park = drive.actionBuilder(new Pose2d(2, -27, Math.PI / 2))
-                .setTangent(-Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(38, -52, Math.PI / 2), 0);
+            bar2Wall[i/3] = drive.actionBuilder(new Pose2d(i-4-runs, -26+runs, Math.PI / 2))
+                    .fresh()
+                    .setTangent(-Math.PI / 2)
+                    .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
+        }
