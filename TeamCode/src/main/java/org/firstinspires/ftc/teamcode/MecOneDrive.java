@@ -1,23 +1,23 @@
 package org.firstinspires.ftc.teamcode;
-import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
 
+import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import java.lang.Math;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 //
 @TeleOp(name="MecOneDrive")
 public class MecOneDrive extends LinearOpMode
 {
     double startTime = 0;
-    int runs = 0;
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime ampTimer = new ElapsedTime();
     boolean ryanMode = false;
@@ -42,21 +42,16 @@ public class MecOneDrive extends LinearOpMode
 
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(40,-56,-Math.PI/2));
 
+
         TrajectoryActionBuilder[] wall2Bar = new TrajectoryActionBuilder[4];
         TrajectoryActionBuilder[] bar2Wall = new TrajectoryActionBuilder[4];
 
-        TrajectoryActionBuilder wallPos = drive.actionBuilder(new Pose2d(40, -56, -Math.PI / 2));
-
-        TrajectoryActionBuilder barPos = drive.actionBuilder(new Pose2d(-4, -26, Math.PI / 2));
-
-
-
         for (int i = 0;i<=9;i+=3) {
-            wall2Bar[i/3] = wallPos.endTrajectory().fresh()
+            wall2Bar[i/3] = drive.actionBuilder(new Pose2d(40,-56,-Math.PI/2))
                     .setTangent(Math.PI / 2)
                     .splineToSplineHeading(new Pose2d(i-4, -28, Math.PI / 2), Math.PI / 2);
 
-            bar2Wall[i/3] = barPos.endTrajectory().fresh()
+            bar2Wall[i/3] = drive.actionBuilder(new Pose2d(i-4,-26,Math.PI/2))
                     .setTangent(-Math.PI / 2)
                     .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
         }
@@ -74,7 +69,8 @@ public class MecOneDrive extends LinearOpMode
         // The while loop below runs until Play is pressed
         // Current info is displayed
         while (!isStarted() && !isStopRequested()){
-            robot.claw.setPosition(robot.clawOpen);
+            if (robot.pixy.getVoltage() > 0.1) robot.claw.setPosition(robot.clawClosed);
+            else robot.claw.setPosition(robot.clawOpen);
             telemetry.addData("tilt pos", robot.tilt.getCurrentPosition());
             telemetry.addData("lift pos", robot.lift.getCurrentPosition());
             telemetry.addData("tilt target", robot.tiltTarget);
@@ -215,11 +211,12 @@ public class MecOneDrive extends LinearOpMode
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
 
-            if (currentGamepad1.right_bumper && robot.liftPosition <100 ){
+            if ((currentGamepad1.right_trigger > 0.3 || currentGamepad1.right_bumper)
+                    && robot.liftPosition < 100 && robot.tiltPosition < 300 ){
                 if(robot.grabSpecimen()) {
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
-                    runBlocking(new SequentialAction(wallPos.build()));
+                    SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-40,56,-Math.PI/2));
                     runBlocking(new SequentialAction(wall2Bar[specimenCount].build()));
                     robot.touch.getState();
                     robot.forwardTouch();
@@ -229,12 +226,12 @@ public class MecOneDrive extends LinearOpMode
                 }
             }
 
-            if (currentGamepad1.left_bumper && robot.liftPosition > barHeight*.8){
+            if ((currentGamepad1.left_trigger > 0.3 ||currentGamepad1.left_bumper)
+                    && Math.abs(robot.liftPosition - barHeight) < 500){
                 robot.releaseSpecimen();
-                runBlocking(new SequentialAction(barPos.build()));
+                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(specimenCount-4,-26,Math.PI/2));
                 runBlocking(new SequentialAction(bar2Wall[specimenCount].build()));
                 specimenCount++;
-                runs++;
                 if (specimenCount==4) specimenCount = 0;
                 robot.liftTarget = 0;
                 robot.lift.setTargetPosition(robot.liftTarget);
@@ -383,4 +380,4 @@ public class MecOneDrive extends LinearOpMode
 
         } //brace ends "while opMode is active" loop
     }  //brace ends runOpMode method
-} //brace ends Mec.java class
+} //brace ends MecOneDrive.java class

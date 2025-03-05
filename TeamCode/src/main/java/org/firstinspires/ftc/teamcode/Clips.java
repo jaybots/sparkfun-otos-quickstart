@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode;
-
 import static com.acmerobotics.roadrunner.ftc.Actions.runBlocking;
 
 import com.acmerobotics.roadrunner.Pose2d;
@@ -7,17 +6,16 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
 import java.lang.Math;
-//
 
 @Autonomous(name = "Clips", group = "Right Side (Clip Red/Blue blocks)")
 public class Clips extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
 
-    //ElapsedTime match = new ElapsedTime();
     int cutTime = 25;
     double startTime=0;
 
@@ -37,11 +35,15 @@ public class Clips extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(43, -46), -Math.PI / 2)
                 .strafeTo(new Vector2d(34,-46));
 
-        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
+        TrajectoryActionBuilder wall2Bar1 = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
+                .setTangent(Math.PI / 2)
+                .splineToSplineHeading(new Pose2d(-2, -27, Math.PI / 2), Math.PI / 2);
+
+        TrajectoryActionBuilder wall2Bar2 = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(2, -27, Math.PI / 2), Math.PI / 2);
 
-        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(2, -27, Math.PI / 2))
+        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(-2, -27, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
                 .splineToSplineHeading(new Pose2d(38, -52, -Math.PI / 2), -Math.PI / 2);
 
@@ -83,11 +85,13 @@ public class Clips extends LinearOpMode {
                 robot.lift.setTargetPosition(2050);
                 sleep(100);
                 robot.tilt.setTargetPosition(0);
-                runBlocking(new SequentialAction(wall2Bar.build()));
+                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(34, -56, -Math.PI / 2));
+                runBlocking(new SequentialAction(wall2Bar1.build()));
                 robot.touch.getState();
                 robot.forwardTouch();
                 robot.releaseSpecimen();
                 robot.tilt.setTargetPosition(150);
+                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-2, -27, Math.PI / 2));
                 runBlocking(new SequentialAction(bar2Wall.build()));
                 robot.touch.getState();
                 robot.forwardTouch();
@@ -96,21 +100,31 @@ public class Clips extends LinearOpMode {
                     robot.backTime(.2, 500);
                     sleep(1500);
                     robot.forwardTouch();
-                    if (getRuntime()-startTime > 25000) {
+                    if (getRuntime() - startTime > 25000) {
                         break;
                     }
                     goodGrab = robot.grabSpecimen();
                 }
+                if (getRuntime() - startTime < cutTime){
+                    robot.lift.setTargetPosition(0);
+                    robot.tilt.setTargetPosition(0);
+                    robot.tiltTarget = 0;
+                    robot.liftTarget = 0;
+                    sleep((30 - (int)(getRuntime()) - 1)* 1000L);
+                    break;
+                }
+                robot.lift.setTargetPosition(2050);
+                sleep(100);
+                robot.tilt.setTargetPosition(0);
+                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(34, -56, -Math.PI / 2));
+                runBlocking(new SequentialAction(wall2Bar2.build()));
+                robot.touch.getState();
+                robot.forwardTouch();
+                robot.releaseSpecimen();
+                robot.tilt.setTargetPosition(0);
+                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(2, -27, -Math.PI / 2));
+                runBlocking(new SequentialAction(park.build()));
             }
-            robot.lift.setTargetPosition(2050);
-            sleep(100);
-            robot.tilt.setTargetPosition(0);
-            runBlocking(new SequentialAction(wall2Bar.build()));
-            robot.touch.getState();
-            robot.forwardTouch();
-            robot.releaseSpecimen();
-            robot.tilt.setTargetPosition(150);
-            runBlocking(new SequentialAction(park.build()));
             done = true;
         } //while opModeIsActive
     }  //ends runOpMode

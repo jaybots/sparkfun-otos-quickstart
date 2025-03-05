@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -59,6 +59,7 @@ public class Yellow2 extends LinearOpMode {
             robot.backTime(.2,1000);
             robot.lift.setTargetPosition(1500);
             sleep(1000);
+            SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-51, -50,Math.toRadians(225)));
             Actions.runBlocking(new SequentialAction(tab3.build()));
             robot.tilt.setTargetPosition(2150);
             sleep(1000);
