@@ -251,7 +251,7 @@ public class MecOneDrive extends LinearOpMode
                 robot.twistPosition -= 0.02;
             }
 
-            //fast lift control
+            //fast lift controls
             if (currentGamepad1.x){
                 if (robot.liftPosition < barHeight) {
                     robot.liftTarget = barHeight;

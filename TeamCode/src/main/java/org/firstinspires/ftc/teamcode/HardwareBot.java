@@ -245,7 +245,7 @@ public class HardwareBot
         }
 
         /**
-         * Drives forward using time
+         * Drives forward using time in in milliseconds
          * @param speed as double
          * @param time in milliseconds
          */
