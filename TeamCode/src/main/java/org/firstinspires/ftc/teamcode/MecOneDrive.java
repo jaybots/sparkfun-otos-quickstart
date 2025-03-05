@@ -22,6 +22,7 @@ public class MecOneDrive extends LinearOpMode
     ElapsedTime ampTimer = new ElapsedTime();
     boolean ryanMode = false;
     double amps = 0;
+    boolean hanging = false;
     HardwareBot robot = new HardwareBot();
     double speedFactor = .7;
     double drv = 0;
@@ -93,16 +94,14 @@ public class MecOneDrive extends LinearOpMode
         robot.led.setPower(0);
 
         while (opModeIsActive()) {
-            telemetry.addData("touch", robot.touch.getState());
-            telemetry.addData("tilt pos", robot.tilt.getCurrentPosition());
-            telemetry.addData("lift pos", robot.lift.getCurrentPosition());
-            telemetry.update();
 
-            if (currentGamepad2.dpad_up) robot.forwardTouch();
+            telemetry.addData("tilt position", robot.tilt.getCurrentPosition());
+            telemetry.addData("tiltTarget", robot.tiltTarget);
+            telemetry.update();
 
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
 
-
+            if (hanging) robot.tiltTarget= 400;
             robot.tilt.setTargetPosition(robot.tiltTarget);
             robot.lift.setTargetPosition(robot.liftTarget);
 
@@ -181,15 +180,19 @@ public class MecOneDrive extends LinearOpMode
 
             //PRIMARY CONTROLS THAT ARE ACTIVE IN ALL MODES
 
+
+
             //wheel control
             drv  = -currentGamepad1.left_stick_y;
             if (!robot.touch.getState() && drv > 0.2 ) drv = 0.2;
             strafe = currentGamepad1.left_stick_x*.75;
             twist  = currentGamepad1.right_stick_x*.75;
 
+
+
             //prevent rotation of robot when lift control up/down in use
             if (Math.abs(currentGamepad1.right_stick_y)>.4) twist = 0;
-            if (ryanMode) speedFactor *= 1.2;
+            if (ryanMode) speedFactor *= 1.4;
 
             speeds[0] = (drv + strafe + twist) * speedFactor;
             speeds[1] = (drv - strafe - twist) * speedFactor;
@@ -216,7 +219,7 @@ public class MecOneDrive extends LinearOpMode
                 if(robot.grabSpecimen()) {
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
-                    SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-40,56,-Math.PI/2));
+                    SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(40,-56,-Math.PI/2));
                     runBlocking(new SequentialAction(wall2Bar[specimenCount].build()));
                     robot.touch.getState();
                     robot.forwardTouch();
@@ -263,7 +266,8 @@ public class MecOneDrive extends LinearOpMode
 
             //hang control
             if (currentGamepad1.back) robot.hang.setPower(-1);
-            else if(currentGamepad1.start ){
+            else if(currentGamepad1.guide && !previousGamepad1.guide){
+                hanging = !hanging;
                 robot.hang.setPower(1);
                 robot.tiltTarget = 400;
                 robot.tilt.setTargetPosition(400);
@@ -272,7 +276,7 @@ public class MecOneDrive extends LinearOpMode
 
             //rotate tilt using dpad - doesn't prevent tilt from going higher than it should
             double sf = 1;
-            if (ryanMode) sf = 1.1;
+            if (ryanMode) sf = 1.2;
             if (currentGamepad1.dpad_down) {
                 robot.tiltTarget = Math.max(0, robot.tiltTarget - (int)(30*sf));
             }
@@ -308,16 +312,15 @@ public class MecOneDrive extends LinearOpMode
                 //CONTROLS FOR BASIC DRIVE MODE
                 case ADRIVE:
 
+                    if (currentGamepad1.b) robot.twist.setPosition(robot.twistZero);
+
                     //fastest driving speeds
                     if (currentGamepad1.x) {
                         robot.liftTarget = barHeight;
                         robot.tiltTarget = 0;
                         robot.twist.setPosition(robot.twistZero);
                     }
-                    if (currentGamepad1.a) {
-                        robot.tiltTarget = tiltVertical;
-                        robot.liftTarget = 0;
-                    }
+
                     speedFactor = .7;
                     break;
 

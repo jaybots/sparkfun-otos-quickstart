@@ -16,7 +16,7 @@ import java.lang.Math;
 public class Clips extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
 
-    int cutTime = 25;
+    int cutTime = 30;
     double startTime=0;
 
     public void runOpMode() {
@@ -41,7 +41,7 @@ public class Clips extends LinearOpMode {
 
         TrajectoryActionBuilder wall2Bar2 = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
                 .setTangent(Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(2, -27, Math.PI / 2), Math.PI / 2);
+                .splineToSplineHeading(new Pose2d(0, -27, Math.PI / 2), Math.PI / 2);
 
         TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(-2, -27, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
@@ -81,7 +81,7 @@ public class Clips extends LinearOpMode {
                 }
                 goodGrab = robot.grabSpecimen();
             }
-            if (getRuntime()-startTime<cutTime) {
+
                 robot.lift.setTargetPosition(2050);
                 sleep(100);
                 robot.tilt.setTargetPosition(0);
@@ -105,14 +105,7 @@ public class Clips extends LinearOpMode {
                     }
                     goodGrab = robot.grabSpecimen();
                 }
-                if (getRuntime() - startTime < cutTime){
-                    robot.lift.setTargetPosition(0);
-                    robot.tilt.setTargetPosition(0);
-                    robot.tiltTarget = 0;
-                    robot.liftTarget = 0;
-                    sleep((30 - (int)(getRuntime()) - 1)* 1000L);
-                    break;
-                }
+
                 robot.lift.setTargetPosition(2050);
                 sleep(100);
                 robot.tilt.setTargetPosition(0);
@@ -122,9 +115,9 @@ public class Clips extends LinearOpMode {
                 robot.forwardTouch();
                 robot.releaseSpecimen();
                 robot.tilt.setTargetPosition(0);
-                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(2, -27, -Math.PI / 2));
+                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(2, -27, Math.PI / 2));
                 runBlocking(new SequentialAction(park.build()));
-            }
+
             done = true;
         } //while opModeIsActive
     }  //ends runOpMode
