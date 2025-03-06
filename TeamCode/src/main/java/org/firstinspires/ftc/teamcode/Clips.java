@@ -62,7 +62,7 @@ public class Clips extends LinearOpMode {
         robot.tilt.setPower(1);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
-            robot.lift.setTargetPosition(2140);
+            robot.lift.setTargetPosition(2100);
             robot.tilt.setTargetPosition(300);
             sleep(200);
             runBlocking(new SequentialAction(start.build()));

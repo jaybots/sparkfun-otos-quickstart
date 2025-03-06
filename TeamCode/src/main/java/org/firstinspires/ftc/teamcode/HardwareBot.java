@@ -38,7 +38,7 @@ public class HardwareBot
     public double clawOpen = 0.2;
     public double clawClosed = 0.58;
     public double liftPower = 1;
-    public double tiltPower = 0.7;
+    public double tiltPower = 0.8;
     public int liftPosition = 0;
     public int tiltPosition = 0;
     public int liftTarget = 0;

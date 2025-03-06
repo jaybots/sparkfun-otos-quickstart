@@ -30,7 +30,6 @@ public class MecOneDrive extends LinearOpMode
     double twist = 0;
     int barHeight = 1860;
     int tiltVertical = 150;
-
     boolean grab = false;
     boolean release = false;
     enum Mode {ADRIVE, BSUB, XBASKET, YBAR}
@@ -43,20 +42,13 @@ public class MecOneDrive extends LinearOpMode
 
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(40,-56,-Math.PI/2));
 
-
-        TrajectoryActionBuilder[] wall2Bar = new TrajectoryActionBuilder[4];
-        TrajectoryActionBuilder[] bar2Wall = new TrajectoryActionBuilder[4];
-
-        for (int i = 0;i<=9;i+=3) {
-            wall2Bar[i/3] = drive.actionBuilder(new Pose2d(40,-56,-Math.PI/2))
+        TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(40,-56,-Math.PI/2))
                     .setTangent(Math.PI / 2)
-                    .splineToSplineHeading(new Pose2d(i-4, -28, Math.PI / 2), Math.PI / 2);
+                    .splineToSplineHeading(new Pose2d(-2, -28, Math.PI / 2), Math.PI / 2);
 
-            bar2Wall[i/3] = drive.actionBuilder(new Pose2d(i-4,-26,Math.PI/2))
+        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(-2,-26,Math.PI/2))
                     .setTangent(-Math.PI / 2)
                     .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
-        }
-
 
         Gamepad currentGamepad1 = new Gamepad();
         Gamepad currentGamepad2 = new Gamepad();
@@ -95,7 +87,7 @@ public class MecOneDrive extends LinearOpMode
 
         while (opModeIsActive()) {
 
-            telemetry.addData("tilt position", robot.tilt.getCurrentPosition());
+            telemetry.addData("tilt position", robot.tiltPosition);
             telemetry.addData("tiltTarget", robot.tiltTarget);
             telemetry.update();
 
@@ -220,7 +212,7 @@ public class MecOneDrive extends LinearOpMode
                     robot.liftTarget = barHeight;
                     robot.lift.setTargetPosition(barHeight);
                     SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(40,-56,-Math.PI/2));
-                    runBlocking(new SequentialAction(wall2Bar[specimenCount].build()));
+                    runBlocking(new SequentialAction(wall2Bar.build()));
                     robot.touch.getState();
                     robot.forwardTouch();
                 }
@@ -233,9 +225,7 @@ public class MecOneDrive extends LinearOpMode
                     && Math.abs(robot.liftPosition - barHeight) < 500){
                 robot.releaseSpecimen();
                 SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(specimenCount-4,-26,Math.PI/2));
-                runBlocking(new SequentialAction(bar2Wall[specimenCount].build()));
-                specimenCount++;
-                if (specimenCount==4) specimenCount = 0;
+                runBlocking(new SequentialAction(bar2Wall.build()));
                 robot.liftTarget = 0;
                 robot.lift.setTargetPosition(robot.liftTarget);
                 robot.touch.getState();
@@ -258,21 +248,23 @@ public class MecOneDrive extends LinearOpMode
                     robot.tiltTarget  = 0;
                     robot.twist.setPosition(1);
                 }
-                else if (robot.liftPosition > barHeight -50){
+                else if (robot.liftPosition > barHeight - 50){
                     robot.liftTarget = robot.maxHeight;
                     robot.twist.setPosition(robot.twistZero);
                 }
             }
 
             //hang control
-            if (currentGamepad1.back) robot.hang.setPower(-1);
-            else if(currentGamepad1.guide && !previousGamepad1.guide){
-                hanging = !hanging;
+            if (currentGamepad1.back){
+                robot.hang.setPower(-1);
+                hanging = false;
+            }
+            if (currentGamepad1.guide){
+                hanging = true;
                 robot.hang.setPower(1);
                 robot.tiltTarget = 400;
                 robot.tilt.setTargetPosition(400);
             }
-            else robot.hang.setPower(0);
 
             //rotate tilt using dpad - doesn't prevent tilt from going higher than it should
             double sf = 1;
