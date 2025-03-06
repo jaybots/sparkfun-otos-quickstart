@@ -259,16 +259,18 @@ public class MecOneDrive extends LinearOpMode
                 robot.hang.setPower(-1);
                 hanging = false;
             }
-            if (currentGamepad1.guide){
+            else if (currentGamepad1.guide){
                 hanging = true;
                 robot.hang.setPower(1);
+                robot.tilt.setPower(1);
                 robot.tiltTarget = 400;
                 robot.tilt.setTargetPosition(400);
             }
+            else robot.hang.setPower(0);
 
             //rotate tilt using dpad - doesn't prevent tilt from going higher than it should
             double sf = 1;
-            if (ryanMode) sf = 1.2;
+            if (ryanMode) sf = 1.5;
             if (currentGamepad1.dpad_down) {
                 robot.tiltTarget = Math.max(0, robot.tiltTarget - (int)(30*sf));
             }

@@ -60,6 +60,7 @@ public class Clips extends LinearOpMode {
         boolean done = false;
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
+        robot.claw.setPosition(robot.clawClosed);
         while (opModeIsActive() && !done) {
             if (isStopRequested()) return;
             robot.lift.setTargetPosition(2100);
@@ -89,6 +90,7 @@ public class Clips extends LinearOpMode {
                 runBlocking(new SequentialAction(wall2Bar1.build()));
                 robot.touch.getState();
                 robot.forwardTouch();
+                sleep(500);
                 robot.releaseSpecimen();
                 robot.tilt.setTargetPosition(150);
                 SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-2, -27, Math.PI / 2));
@@ -113,6 +115,7 @@ public class Clips extends LinearOpMode {
                 runBlocking(new SequentialAction(wall2Bar2.build()));
                 robot.touch.getState();
                 robot.forwardTouch();
+                sleep(500);
                 robot.releaseSpecimen();
                 robot.tilt.setTargetPosition(0);
                 SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(2, -27, Math.PI / 2));

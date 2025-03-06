@@ -99,7 +99,7 @@ public class HardwareBot
         hang.setPower(0);
         spin1.setPower(0);
         spin2.setPower(0);
-        claw.setPosition(clawClosed);
+        //claw.setPosition(clawClosed);
         led.setPower(0);
 
 
@@ -173,7 +173,6 @@ public class HardwareBot
         liftTarget = 1000;
         lift.setTargetPosition(liftTarget);
         sleep(500);
-        tilt.setPower(0);
         tiltTarget = 0;
         tilt.setTargetPosition(tiltTarget);
         if (pixy.getVoltage() < 1){
@@ -250,7 +249,6 @@ public class HardwareBot
          * @param time in milliseconds
          */
         public void forwardTime ( double speed, int time){
-
             leftFront.setPower(speed);
             rightFront.setPower(speed);
             leftBack.setPower(speed);
@@ -260,6 +258,7 @@ public class HardwareBot
         }
 
     public void forwardTouch( ){
+            touch.getState();
         if (!touch.getState()) {
             return;
         }
@@ -301,22 +300,7 @@ public class HardwareBot
             sleep(time);
             stopWheels();
         }
-    public void retractPixy (){
-        while (pixy.getVoltage() > .1 && liftPosition > 1540){
-            liftPosition--;
-            lift.setTargetPosition(liftPosition);
-        }
-    }
-    public void rightPixy (){
-        double speed = 0.15;
-        leftFront.setPower(speed);
-        rightFront.setPower(-speed);
-        leftBack.setPower(speed);
-        rightBack.setPower(-speed);
-        while (pixy.getVoltage() < 1.6){
-        }
-        stopWheels();
-    }
+
     public void leftPixy (){
         double speed = 0.1;
         leftFront.setPower(-speed);
