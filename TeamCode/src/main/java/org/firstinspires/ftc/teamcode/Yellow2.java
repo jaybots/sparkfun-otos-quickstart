@@ -1,22 +1,13 @@
 package org.firstinspires.ftc.teamcode;
-import androidx.annotation.NonNull;
 
-import com.acmerobotics.roadrunner.AccelConstraint;
-import com.acmerobotics.roadrunner.AngularVelConstraint;
-import com.acmerobotics.roadrunner.Arclength;
-import com.acmerobotics.roadrunner.MinMax;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Pose2dDual;
-import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
 
 @Autonomous(name = "Yellow 2 samples in basket")
 public class Yellow2 extends LinearOpMode {
@@ -52,57 +43,53 @@ public class Yellow2 extends LinearOpMode {
         boolean done = false;
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
-        while (opModeIsActive() && !done) {
-            if (isStopRequested()) return;
-            robot.twist.setPosition(robot.twistZero);
-            robot.claw.setPosition(robot.clawOpen);
-            Actions.runBlocking(new SequentialAction(basket.build()));
-            robot.lift.setTargetPosition(robot.maxHeight);
-            while (robot.lift.getCurrentPosition()<robot.maxHeight - 100) {}
-            robot.tilt.setTargetPosition(300);
-            robot.spin1.setPower(-1);
-            robot.spin2.setPower(1);
-            sleep(1000);
-            robot.tilt.setTargetPosition(150);
-            robot.spin1.setPower(0);
-            robot.spin2.setPower(0);
-            sleep(500);
-            robot.lift.setTargetPosition(1600);
-            SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-57, -57,Math.toRadians(225)));
-            Actions.runBlocking(new SequentialAction(back.build()));
-            robot.lift.setTargetPosition(1600);
-            robot.tilt.setTargetPosition(2200);
-            sleep(1000);
-            robot.leftPixy();
-            robot.lift.setTargetPosition(1100);
-            sleep(500);
-            robot.spinIn();
-            robot.tilt.setTargetPosition(2350);
-            sleep(600);
-            robot.spinStop();
-            robot.tilt.setTargetPosition(0);
-            sleep(1000);
-            robot.lift.setTargetPosition(robot.maxHeight);
-            SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-49, -49,Math.toRadians(85)));
-            Actions.runBlocking(new SequentialAction(basket2.build()));
-            robot.tilt.setTargetPosition(300);
-            sleep(1000);
-            robot.spinOut();
-            sleep(2000);
-            robot.spinStop();
-            robot.tilt.setTargetPosition(0);
-            sleep(700);
-            robot.lift.setTargetPosition(0);
-            sleep(300);
-            SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-55, -55,Math.toRadians(238)));
-            Actions.runBlocking(new SequentialAction(park.build()));
-            robot.backTime(.2,1000);
-            robot.hang.setPower(.5);
-            sleep(2500);
-            robot.hang.setPower(0);
-            done = true;
-        }
+
+        if (isStopRequested()) return;
+        robot.twist.setPosition(robot.twistZero);
+        robot.claw.setPosition(robot.clawOpen);
+        Actions.runBlocking(new SequentialAction(basket.build()));
+        robot.lift.setTargetPosition(robot.maxHeight);
+        while (robot.lift.getCurrentPosition()<robot.maxHeight - 100) {}
+        robot.tilt.setTargetPosition(300);
+        robot.spin1.setPower(-1);
+        robot.spin2.setPower(1);
+        sleep(1000);
+        robot.tilt.setTargetPosition(150);
+        robot.spin1.setPower(0);
+        robot.spin2.setPower(0);
+        sleep(500);
+        robot.lift.setTargetPosition(1600);
+        SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-57, -57,Math.toRadians(225)));
+        Actions.runBlocking(new SequentialAction(back.build()));
+        robot.lift.setTargetPosition(1600);
+        robot.tilt.setTargetPosition(2200);
+        sleep(1000);
+        robot.leftPixy();
+        robot.lift.setTargetPosition(1100);
+        sleep(500);
+        robot.spinIn();
+        robot.tilt.setTargetPosition(2350);
+        sleep(600);
+        robot.spinStop();
+        robot.tilt.setTargetPosition(0);
+        sleep(1000);
+        robot.lift.setTargetPosition(robot.maxHeight);
+        SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-49, -49,Math.toRadians(85)));
+        Actions.runBlocking(new SequentialAction(basket2.build()));
+        robot.tilt.setTargetPosition(300);
+        sleep(1000);
+        robot.spinOut();
+        sleep(2000);
+        robot.spinStop();
+        robot.tilt.setTargetPosition(0);
+        sleep(700);
+        robot.lift.setTargetPosition(0);
+        sleep(300);
+        SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-55, -55,Math.toRadians(238)));
+        Actions.runBlocking(new SequentialAction(park.build()));
+        robot.backTime(.2,1000);
+        robot.hang.setPower(.5);
+        sleep(2500);
+        robot.hang.setPower(0);
     }
-
-
 }

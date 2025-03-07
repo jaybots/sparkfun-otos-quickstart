@@ -16,7 +16,7 @@ import java.lang.Math;
 public class Clips extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
 
-    int cutTime = 30;
+    int cutTime = 26;
     double startTime=0;
 
     public void runOpMode() {
@@ -60,69 +60,59 @@ public class Clips extends LinearOpMode {
         boolean done = false;
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
-        robot.claw.setPosition(robot.clawClosed);
-        while (opModeIsActive() && !done) {
-            if (isStopRequested()) return;
-            robot.lift.setTargetPosition(2100);
-            robot.tilt.setTargetPosition(300);
-            sleep(200);
-            runBlocking(new SequentialAction(start.build()));
-            sleep(300);
-            robot.releaseSpecimen();
-            robot.tilt.setTargetPosition(150);
-            runBlocking(new SequentialAction(pushBlock.build()));
-            robot.forwardTouch();
-            boolean goodGrab = robot.grabSpecimen();
-            while (!goodGrab) {
-                robot.backTime(.2,1000);
-                sleep(1000);
-                robot.forwardTouch();
-                if (getRuntime()-startTime>cutTime){
-                    break;
-                }
-                goodGrab = robot.grabSpecimen();
+        robot.lift.setTargetPosition(2100);
+        robot.tilt.setTargetPosition(300);
+        sleep(200);
+        runBlocking(new SequentialAction(start.build()));
+        sleep(300);
+        robot.releaseSpecimen();
+        robot.tilt.setTargetPosition(150);
+        runBlocking(new SequentialAction(pushBlock.build()));
+        robot.forwardTouch();
+        boolean goodGrab = robot.grabSpecimen();
+        while (!goodGrab) {
+            robot.backTime(.2,1000);
+            sleep(500);
+            if (getRuntime()-startTime>cutTime){
+                return;
             }
-
-                robot.lift.setTargetPosition(2050);
-                sleep(100);
-                robot.tilt.setTargetPosition(0);
-                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(34, -56, -Math.PI / 2));
-                runBlocking(new SequentialAction(wall2Bar1.build()));
-                robot.touch.getState();
-                robot.forwardTouch();
-                sleep(500);
-                robot.releaseSpecimen();
-                robot.tilt.setTargetPosition(150);
-                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-2, -27, Math.PI / 2));
-                runBlocking(new SequentialAction(bar2Wall.build()));
-                robot.touch.getState();
-                robot.forwardTouch();
-                goodGrab = robot.grabSpecimen();
-                while (!goodGrab) {
-                    robot.backTime(.2, 500);
-                    sleep(1500);
-                    robot.forwardTouch();
-                    if (getRuntime() - startTime > 25000) {
-                        break;
-                    }
-                    goodGrab = robot.grabSpecimen();
-                }
-
-                robot.lift.setTargetPosition(2050);
-                sleep(100);
-                robot.tilt.setTargetPosition(0);
-                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(34, -56, -Math.PI / 2));
-                runBlocking(new SequentialAction(wall2Bar2.build()));
-                robot.touch.getState();
-                robot.forwardTouch();
-                sleep(500);
-                robot.releaseSpecimen();
-                robot.tilt.setTargetPosition(0);
-                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(2, -27, Math.PI / 2));
-                runBlocking(new SequentialAction(park.build()));
-
-            done = true;
-        } //while opModeIsActive
+            robot.forwardTouch();
+            goodGrab = robot.grabSpecimen();
+        }
+        robot.lift.setTargetPosition(2050);
+        sleep(100);
+        robot.tilt.setTargetPosition(0);
+        SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(34, -56, -Math.PI / 2));
+        runBlocking(new SequentialAction(wall2Bar1.build()));
+        robot.touch.getState();
+        robot.forwardTouch();
+        robot.releaseSpecimen();
+        robot.tilt.setTargetPosition(150);
+        SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-2, -27, Math.PI / 2));
+        runBlocking(new SequentialAction(bar2Wall.build()));
+        robot.touch.getState();
+        robot.forwardTouch();
+        goodGrab = robot.grabSpecimen();
+        while (!goodGrab) {
+            robot.backTime(.2, 500);
+            if (getRuntime() - startTime > cutTime) {
+                return;
+            }
+            sleep(500);
+            robot.forwardTouch();
+            goodGrab = robot.grabSpecimen();
+        }
+        robot.lift.setTargetPosition(2050);
+        sleep(100);
+        robot.tilt.setTargetPosition(0);
+        SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(34, -56, -Math.PI / 2));
+        runBlocking(new SequentialAction(wall2Bar2.build()));
+        robot.touch.getState();
+        robot.forwardTouch();
+        robot.releaseSpecimen();
+        robot.tilt.setTargetPosition(0);
+        SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(2, -27, Math.PI / 2));
+        runBlocking(new SequentialAction(park.build()));
     }  //ends runOpMode
 }  //ends Clips class
 
