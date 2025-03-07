@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 public class MecOneDrive extends LinearOpMode
 {
     double hangPower = 0;
+    double setHangTime = 0;
     double startTime = 0;
     ElapsedTime ampTimer = new ElapsedTime();
     boolean ryanMode = false;
@@ -38,9 +39,9 @@ public class MecOneDrive extends LinearOpMode
 
         TrajectoryActionBuilder wall2Bar = drive.actionBuilder(new Pose2d(40,-56,-Math.PI/2))
                     .setTangent(Math.PI / 2)
-                    .splineToSplineHeading(new Pose2d(-2, -28, Math.PI / 2), Math.PI / 2);
+                    .splineToSplineHeading(new Pose2d(2, -28, Math.PI / 2), Math.PI / 2);
 
-        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(-2,-26,Math.PI/2))
+        TrajectoryActionBuilder bar2Wall = drive.actionBuilder(new Pose2d(0,-26,Math.PI/2))
                     .setTangent(-Math.PI / 2)
                     .splineToSplineHeading(new Pose2d(40, -50, -Math.PI / 2), -Math.PI / 2);
 
@@ -74,16 +75,20 @@ public class MecOneDrive extends LinearOpMode
         startTime = getRuntime();
         robot.tilt.setPower(robot.tiltPower);
         robot.lift.setPower(robot.liftPower);
-        robot.hang.setPower(hangPower);
+
         double[] speeds = {0, 0, 0, 0};
         robot.twist.setPosition(robot.twistZero);
         robot.led.setPower(0);
 
         while (opModeIsActive()) {
             if (isStopRequested()) return;
-            telemetry.addData("tilt position", robot.tiltPosition);
-            telemetry.addData("tiltTarget", robot.tiltTarget);
-            telemetry.update();
+//            telemetry.addData("tilt position", robot.tiltPosition);
+//            telemetry.addData("tiltTarget", robot.tiltTarget);
+//            telemetry.addData("time",getRuntime()-startTime);
+//            telemetry.addData("hook power", hangPower);
+//            telemetry.update();
+
+            robot.hang.setPower(hangPower);
 
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
             robot.tilt.setTargetPosition(robot.tiltTarget);
@@ -216,7 +221,7 @@ public class MecOneDrive extends LinearOpMode
             if ((currentGamepad1.left_trigger > 0.3 ||currentGamepad1.left_bumper)
                     && Math.abs(robot.liftPosition - barHeight) < 500){
                 robot.releaseSpecimen();
-                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(-2,-26,Math.PI/2));
+                SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(0,-26,Math.PI/2));
                 runBlocking(new SequentialAction(bar2Wall.build()));
                 robot.liftTarget = 0;
                 robot.lift.setTargetPosition(robot.liftTarget);
@@ -247,6 +252,7 @@ public class MecOneDrive extends LinearOpMode
             }
 
             //hang control
+            if (setHangTime == 0 && getRuntime() - startTime > 60) setHangTime = getRuntime();
             if (currentGamepad1.guide){
                 hangPower = 1;
                 robot.tilt.setPower(1);
@@ -256,7 +262,7 @@ public class MecOneDrive extends LinearOpMode
             else if (currentGamepad1.back){
                 hangPower = -1;
             }
-            else if (getRuntime() - startTime > 60 && getRuntime() - startTime < 62)
+            else if (setHangTime != 0 && getRuntime() - setHangTime < 1 )
                 hangPower = 0.5;
             else hangPower = 0;
 
