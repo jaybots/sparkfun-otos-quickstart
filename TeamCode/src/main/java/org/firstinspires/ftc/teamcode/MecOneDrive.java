@@ -15,11 +15,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 @TeleOp(name="MecOneDrive")
 public class MecOneDrive extends LinearOpMode
 {
+    double hangPower = 0;
     double startTime = 0;
     ElapsedTime ampTimer = new ElapsedTime();
     boolean ryanMode = false;
     double amps = 0;
-    boolean hanging = false;
     HardwareBot robot = new HardwareBot();
     double speedFactor = .7;
     double drv = 0;
@@ -74,6 +74,7 @@ public class MecOneDrive extends LinearOpMode
         startTime = getRuntime();
         robot.tilt.setPower(robot.tiltPower);
         robot.lift.setPower(robot.liftPower);
+        robot.hang.setPower(hangPower);
         double[] speeds = {0, 0, 0, 0};
         robot.twist.setPosition(robot.twistZero);
         robot.led.setPower(0);
@@ -85,8 +86,6 @@ public class MecOneDrive extends LinearOpMode
             telemetry.update();
 
             amps = robot.lift.getCurrent(CurrentUnit.AMPS);
-
-            if (hanging) robot.tiltTarget= 400;
             robot.tilt.setTargetPosition(robot.tiltTarget);
             robot.lift.setTargetPosition(robot.liftTarget);
 
@@ -246,24 +245,20 @@ public class MecOneDrive extends LinearOpMode
                     robot.twist.setPosition(robot.twistZero);
                 }
             }
-            if (getRuntime() - startTime > 60 && getRuntime() - startTime < 62)
-                robot.hang.setPower(0.5);
-            else robot.hang.setPower(0);
 
             //hang control
-            if (currentGamepad1.back){
-                robot.hang.setPower(-1);
-                hanging = false;
-            }
-            else if (currentGamepad1.guide){
-                hanging = true;
-                robot.hang.setPower(1);
+            if (currentGamepad1.guide){
+                hangPower = 1;
                 robot.tilt.setPower(1);
                 robot.tiltTarget = 400;
                 robot.tilt.setTargetPosition(400);
             }
-            else robot.hang.setPower(0);
-
+            else if (currentGamepad1.back){
+                hangPower = -1;
+            }
+            else if (getRuntime() - startTime > 60 && getRuntime() - startTime < 62)
+                hangPower = 0.5;
+            else hangPower = 0;
 
             //rotate tilt using dpad - doesn't prevent tilt from going higher than it should
             double sf = 1;
