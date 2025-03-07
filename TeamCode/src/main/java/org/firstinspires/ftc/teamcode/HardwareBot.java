@@ -234,17 +234,6 @@ public class HardwareBot
         }
 
         /**
-         * Sets power to all drive wheels to the same value
-         * @param power as double
-         */
-        public void setWheels ( double power){
-            leftFront.setPower(power);
-            rightFront.setPower(power);
-            leftBack.setPower(power);
-            rightBack.setPower(power);
-        }
-
-        /**
          * Drives forward using time in in milliseconds
          * @param speed as double
          * @param time in milliseconds
@@ -331,22 +320,12 @@ public class HardwareBot
          * All running motors will still be running
          * @param x time in milliseconds
          */
-        public void sleep ( int x){
+        public void sleep (int x){
             sleeper.reset();
             while (sleeper.milliseconds() < x) {
-                pixy.getVoltage();
-            }
+
         }
-
-        /**
-         * Sets the optical odometer to read 0 position (x and y) and zero heading
-         */
-        public void resetOdo () {
-            odo.setPosition(new SparkFunOTOS.Pose2D(0, 0, 0));
-            sleep(50);
-        }
-
-
+    }
 }
 
 
