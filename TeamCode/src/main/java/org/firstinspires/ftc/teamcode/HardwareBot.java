@@ -303,8 +303,9 @@ public class HardwareBot
 
     public void leftPixy (){
         double speed = 0.1;
-        leftFront.setPower(-speed);
-        rightFront.setPower(speed);
+        double sf = 2;
+        leftFront.setPower(-speed*sf);
+        rightFront.setPower(speed*sf);
         leftBack.setPower(-speed);
         rightBack.setPower(speed);
         while (pixy.getVoltage() < 1.7 || pixy.getVoltage() > 1.9){

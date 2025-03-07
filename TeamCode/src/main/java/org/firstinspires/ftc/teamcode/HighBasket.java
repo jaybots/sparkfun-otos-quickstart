@@ -6,10 +6,11 @@ import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-
-@Autonomous(name = "Left Side (yellow to high basket)")
+@Disabled
+//@Autonomous(name = "Left Side (yellow to high basket)")
 public class HighBasket extends LinearOpMode {
     HardwareBot robot = new HardwareBot();
 
