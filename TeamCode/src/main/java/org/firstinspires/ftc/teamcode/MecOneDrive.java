@@ -203,7 +203,7 @@ public class MecOneDrive extends LinearOpMode
             robot.leftBack.setPower(speeds[2]);
             robot.rightBack.setPower(speeds[3]);
 
-            if ((currentGamepad1.right_trigger > 0.3 || currentGamepad1.right_bumper)
+            if ((currentGamepad1.right_bumper)
                     && robot.liftPosition < 100 && robot.tiltPosition < 300 ){
                 if(robot.grabSpecimen()) {
                     robot.liftTarget = barHeight;
@@ -218,7 +218,7 @@ public class MecOneDrive extends LinearOpMode
                 }
             }
 
-            if ((currentGamepad1.left_trigger > 0.3 ||currentGamepad1.left_bumper)
+            if ((currentGamepad1.left_bumper)
                     && Math.abs(robot.liftPosition - barHeight) < 500){
                 robot.releaseSpecimen();
                 SparkFunOTOSDrive.otos.setPosition(new SparkFunOTOS.Pose2D(0,-26,Math.PI/2));
