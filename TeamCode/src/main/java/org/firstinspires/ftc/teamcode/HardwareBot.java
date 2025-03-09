@@ -258,7 +258,7 @@ public class HardwareBot
         rightFront.setPower(speed);
         leftBack.setPower(speed);
         rightBack.setPower(speed);
-        while (touch.getState() && sleeper.milliseconds()<500) {
+        while (touch.getState() && sleeper.milliseconds()<1000) {
         }
         stopWheels();
     }

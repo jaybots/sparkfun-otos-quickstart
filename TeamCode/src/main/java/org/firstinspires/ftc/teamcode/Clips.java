@@ -30,10 +30,10 @@ public class Clips extends LinearOpMode {
 
         TrajectoryActionBuilder pushBlock = drive.actionBuilder(new Pose2d(0, -28, Math.PI / 2))
                 .setTangent(-Math.PI / 2)
-                .splineToSplineHeading(new Pose2d(34, -34, -Math.PI / 2), Math.PI / 2)
-                .splineToConstantHeading(new Vector2d(34, -21), Math.PI / 2, new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(43, -8), -Math.PI / 2, new TranslationalVelConstraint(20))
-                .splineToConstantHeading(new Vector2d(43, -46), -Math.PI / 2)
+                .splineToSplineHeading(new Pose2d(32, -34, -Math.PI / 2), Math.PI / 2)
+                .splineToConstantHeading(new Vector2d(32, -21), Math.PI / 2, new TranslationalVelConstraint(15))
+                .splineToConstantHeading(new Vector2d(44, -9), -Math.PI / 2, new TranslationalVelConstraint(15))
+                .splineToConstantHeading(new Vector2d(44, -46), -Math.PI / 2)
                 .strafeTo(new Vector2d(34,-46));
 
         TrajectoryActionBuilder wall2Bar1 = drive.actionBuilder(new Pose2d(34, -56, -Math.PI / 2))
@@ -61,11 +61,13 @@ public class Clips extends LinearOpMode {
         boolean done = false;
         robot.lift.setPower(1);
         robot.tilt.setPower(1);
-        robot.lift.setTargetPosition(2050);
-        sleep(200);
+        robot.claw.setPosition(robot.clawClosed);
+        robot.lift.setTargetPosition(2000);
+
         runBlocking(new SequentialAction(start.build()));
         robot.forwardTouch();
-        sleep(500);
+        robot.tilt.setTargetPosition(50);
+        sleep(700);
         robot.releaseSpecimen();
         robot.tilt.setTargetPosition(150);
         runBlocking(new SequentialAction(pushBlock.build()));

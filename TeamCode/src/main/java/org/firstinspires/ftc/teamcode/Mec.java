@@ -3,9 +3,12 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS.Pose2D;
 import java.lang.Math;
 
 @Disabled
@@ -25,7 +28,7 @@ public class Mec extends LinearOpMode
     public void runOpMode() {
 
         robot.init(hardwareMap);
-        SparkFunOTOS.Pose2D pos;
+        SparkFunOTOS.Pose2D pos = robot.odo.getPosition();
         Pose2d initialPose = new Pose2d(7, -61, Math.toRadians(90));
         SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
 
@@ -56,6 +59,18 @@ public class Mec extends LinearOpMode
         robot.lift.setPower(robot.liftPower);
 
         while (opModeIsActive()) {
+
+            pos = robot.odo.getPosition();
+            telemetry.addData("pixy",robot.pixy.getVoltage());
+            telemetry.addData("X coordinate", pos.x);
+            telemetry.addData("Y coordinate", pos.y);
+            telemetry.addData("Heading angle", pos.h);
+            telemetry.addData("tilt pos", robot.tilt.getCurrentPosition());
+            telemetry.addData("lift pos", robot.lift.getCurrentPosition());
+            telemetry.addData("tilt target", robot.tiltTarget);
+            telemetry.addData("lift target", robot.liftTarget);
+            telemetry.addData("lift amps", robot.lift.getCurrent(CurrentUnit.AMPS));
+            telemetry.update();
 
             //reset lift encoder if amps are high and it's in down position
             if (robot.liftPosition < 100 && liftControl > -0.3 && robot.lift.getCurrent(CurrentUnit.AMPS) > 7) {
